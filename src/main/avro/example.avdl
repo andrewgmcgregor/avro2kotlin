@@ -1,0 +1,27 @@
+@namespace("demo")
+protocol ExampleInterface {
+
+  enum ExampleEnum {
+    FOO,
+    BAR,
+    BAZ
+  }
+
+  record ExampleNesting {
+
+    array<int> counts;
+
+    union { null, map<string> } attributes= null;
+  }
+
+  record Example {
+
+    long id;
+
+    union { null, ExampleEnum } my_enum = null;
+
+    union { null, ExampleNesting } my_nested_member = null;
+
+    union { null, string } guid = null;
+  }
+}

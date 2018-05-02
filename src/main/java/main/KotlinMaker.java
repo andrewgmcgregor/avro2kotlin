@@ -9,14 +9,14 @@ public class KotlinMaker {
     public static void main(String[] args) throws Exception {
         ClassLoader classLoader = KotlinMaker.class.getClassLoader();
 
-        try (InputStream in = classLoader.getResourceAsStream("example.avsc")) {
+        try (InputStream in = classLoader.getResourceAsStream("src/main/avro/example.avsc")) {
             Schema topLevelSchema = new Schema.Parser().parse(in);
             showSchema(topLevelSchema);
         }
 
         System.out.println("--------");
 
-        try (InputStream in = classLoader.getResourceAsStream("example.avdl")) {
+        try (InputStream in = classLoader.getResourceAsStream("src/main/avro/example.avdl")) {
             new Idl(in).ProtocolDeclaration()
                     .getTypes()
                     .forEach(KotlinMaker::showSchema);

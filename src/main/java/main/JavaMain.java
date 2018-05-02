@@ -1,11 +1,9 @@
 package main;
 
 import org.apache.avro.Schema;
-import org.apache.avro.compiler.idl.Idl;
 import org.apache.avro.compiler.specific.SpecificCompiler;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.mojo.SchemaMojo;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +20,7 @@ public class JavaMain {
 //        MySchemaMojo mySchemaMojo = new MySchemaMojo();
 
         ClassLoader classLoader = JavaMain.class.getClassLoader();
-        try (InputStream avscFile = classLoader.getResourceAsStream("example.avsc")) {
+        try (InputStream avscFile = classLoader.getResourceAsStream("src/main/avro/example.avsc")) {
             File outputDirectory = new File(System.getProperty("user.dir") + "/src/main/java");
             doCompile(avscFile, outputDirectory);
         }
