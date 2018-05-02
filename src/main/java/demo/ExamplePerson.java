@@ -14,7 +14,7 @@ import org.apache.avro.message.SchemaStore;
 @org.apache.avro.specific.AvroGenerated
 public class ExamplePerson extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = -2744636100838045267L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ExamplePerson\",\"namespace\":\"demo\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"},{\"name\":\"username\",\"type\":[\"string\",\"null\"]},{\"name\":\"wtf\",\"type\":[\"string\",\"int\"]},{\"name\":\"maybeWtf\",\"type\":[\"string\",\"int\",\"null\"]}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ExamplePerson\",\"namespace\":\"Demo\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"},{\"name\":\"username\",\"type\":[\"string\",\"null\"]},{\"name\":\"wtf\",\"type\":[\"string\",\"int\"]},{\"name\":\"maybeWtf\",\"type\":[\"string\",\"int\",\"null\"]}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
