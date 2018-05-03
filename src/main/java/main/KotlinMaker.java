@@ -1,26 +1,19 @@
 package main;
 
 import org.apache.avro.Schema;
-import org.apache.avro.compiler.idl.Idl;
 
-import java.io.InputStream;
+import java.util.Collection;
 
 public class KotlinMaker {
     public static void main(String[] args) throws Exception {
-        ClassLoader classLoader = KotlinMaker.class.getClassLoader();
-
-        try (InputStream in = classLoader.getResourceAsStream("src/main/avro/example.avsc")) {
-            Schema topLevelSchema = new Schema.Parser().parse(in);
-            showSchema(topLevelSchema);
-        }
+        Schema topLevelSchema = SchemaUtils.getSchemaForAvsc("src/main/avro/example.avsc");
+        showSchema(topLevelSchema);
 
         System.out.println("--------");
 
-        try (InputStream in = classLoader.getResourceAsStream("src/main/avro/example.avdl")) {
-            new Idl(in).ProtocolDeclaration()
-                    .getTypes()
-                    .forEach(KotlinMaker::showSchema);
-        }
+        String resourcePath = "src/main/avro/example.avdl";
+        Collection<Schema> schemas = SchemaUtils.getSchemasForAvdl(resourcePath);
+        schemas.forEach(KotlinMaker::showSchema);
     }
 
     private static void showSchema(Schema topLevelSchema) {

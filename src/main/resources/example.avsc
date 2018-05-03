@@ -3,8 +3,6 @@
  "name": "ExamplePerson",
  "fields": [
      {"name": "id", "type": "int"},
-     {"name": "username",  "type": ["string", "null"]},
-     {"name": "wtf",  "type": ["string", "int"]},
-     {"name": "maybeWtf",  "type": ["string", "int", "null"]}
+     {"name": "username",  "type": ["string", "null"]}
  ]
 }
