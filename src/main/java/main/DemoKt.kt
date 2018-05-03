@@ -1,10 +1,7 @@
 package main
 
 import com.squareup.kotlinpoet.*
-import demo.ExamplePerson
-import demo.ExamplePersonKt
 import org.apache.avro.Schema
-import org.apache.avro.specific.SpecificRecord
 
 fun main(args: Array<String>) {
     val schema = SchemaUtils.getSchemaForAvsc("example.avsc")
@@ -59,37 +56,44 @@ private fun toSimpleKotlinType(type: Schema.Type): TypeName? {
 
 private fun generate(schema: Schema) {
     var javaName = schema.name
+    var fullJavaName = schema.fullName
     var kotlinName = "${schema.name}Kt"
+    var fullKotlinName = "${fullJavaName}Kt"
 
     val primaryConstructor = FunSpec.constructorBuilder()
-    schema.fields.filterNotNull().forEach { field ->
-        primaryConstructor.addParameter(
-                name = field.name(),
-                type = toKotlinType(field.schema()))
-    }
+    var fieldNamesAndTypes = schema.fields
+            .filterNotNull()
+            .map { field -> Pair(field.name(), toKotlinType(field.schema())) }
+    fieldNamesAndTypes.forEach { (name, type) -> primaryConstructor.addParameter(name, type) }
 
-    val fieldNames = schema.fields
-            .map { it.name() }
+    var fieldNames = schema.fields.map { it.name() }
+    val fieldList = fieldNames.joinToString(prefix = "(", separator = ", ", postfix = ")")
+    val fromAvroSpecificRecordParameterName = "${schema.name.decapitalize()}"
+    val kotlinConstructorFieldList = fieldNamesAndTypes
+            .map { (name, type) ->
+                val suffix = if (type.nullable) "!!" else ""
+                "${name} = ${fromAvroSpecificRecordParameterName}.${name}${suffix}"
+            }
             .joinToString(prefix = "(", separator = ", ", postfix = ")")
+
+    var javaType = Class.forName(schema.fullName)
+
+    val fromAvroSpecificRecord = FunSpec.builder("fromAvroSpecificRecord")
+            .returns(Class.forName(fullKotlinName))
+            .addParameter(fromAvroSpecificRecordParameterName, javaType)
+            .addStatement("${kotlinName}${kotlinConstructorFieldList}")
 
     FileSpec.builder("", kotlinName)
             .addType(TypeSpec.classBuilder(kotlinName)
                     .addModifiers(KModifier.DATA)
                     .primaryConstructor(primaryConstructor.build())
                     .addFunction(FunSpec.builder("toAvroSpecificRecord")
-                            .returns(Class.forName(schema.fullName))
-                            .addStatement("${javaName}${fieldNames}")
+                            .returns(javaType)
+                            .addStatement("${javaName}${fieldList}")
                             .build())
-//                    .companionObject(TypeSpec.companionObjectBuilder(kotlinName)
-//                            .addFunction(FunSpec.builder("fromJava")
-//                                    .addParameter("specificRecord", SpecificRecord::class)
-//                                    .addStatement("UserKt(" +
-//                                            "id = specificRecord.id!,\n" +
-//                                            "username = specificRecord.username,\n" +
-//                                            "wtf = specificRecord.username!,\n" +
-//                                            "maybeWtf = specificRecord)")
-//                                    .build())
-//                            .build())
+                    .companionObject(TypeSpec.companionObjectBuilder(kotlinName)
+                            .addFunction(fromAvroSpecificRecord.build())
+                            .build())
                     .build()
             )
             .build()
