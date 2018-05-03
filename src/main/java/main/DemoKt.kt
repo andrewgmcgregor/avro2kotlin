@@ -72,14 +72,18 @@ private fun generate(schema: Schema) {
                 type = toKotlinType(field.schema()))
     }
 
+    val fieldNames = schema.fields
+            .map { it.name() }
+            .joinToString(prefix = "(", separator = ", ", postfix = ")")
+
     FileSpec.builder("", kotlinName)
             .addType(TypeSpec.classBuilder(kotlinName)
                     .addModifiers(KModifier.DATA)
                     .primaryConstructor(primaryConstructor.build())
-//                    .addFunction(FunSpec.builder("toJava")
-//                            .returns(Class.forName(javaName))
-//                            .addStatement("${javaName}(${schema.fields ^^^ get name then comma separate ^^^})")
-//                            .build())
+                    .addFunction(FunSpec.builder("toAvroSpecificRecord")
+                            .returns(Class.forName(schema.fullName))
+                            .addStatement("${javaName}${fieldNames}")
+                            .build())
 //                    .companionObject(TypeSpec.companionObjectBuilder(kotlinName)
 //                            .addFunction(FunSpec.builder("fromJava")
 //                                    .addParameter("specificRecord", SpecificRecord::class)
