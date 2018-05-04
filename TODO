@@ -1,0 +1,11 @@
+nested types
+make it a command line tool
+make it a maven plugin: get the two plugins to play nicely together (or maybe do the avro conversion myself)
+one kotlin file per protocol
+
+support arrays
+support maps
+support other types
+
+recursive types
+support multiple non-null types in a union (prob convert to Any/Any?)

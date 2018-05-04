@@ -1,26 +1,29 @@
 @namespace("demo")
 protocol ExampleInterface {
 
-  enum ExampleEnum {
-    FOO,
-    BAR,
-    BAZ
-  }
+//  enum ExampleEnum {
+//    FOO,
+//    BAR,
+//    BAZ
+//  }
 
   record ExampleNesting {
 
-    array<int> counts;
+//    array<int> counts;
 
-    union { null, map<string> } attributes= null;
+//    union { null, map<string> } attributes= null;
+
+    boolean isGood;
+
   }
 
   record Example {
 
     long id;
 
-    union { null, ExampleEnum } my_enum = null;
+//    union { null, ExampleEnum } my_enum = null;
 
-    union { null, ExampleNesting } my_nested_member = null;
+//    union { null, ExampleNesting } my_nested_member = null;
 
     union { null, string } guid = null;
   }
