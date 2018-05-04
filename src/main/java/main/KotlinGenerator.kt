@@ -4,18 +4,22 @@ import com.squareup.kotlinpoet.*
 import org.apache.avro.Schema
 
 object KotlinGenerator {
-    fun generate(schema: Schema): FileSpec =
-        FileSpec.builder(schema.namespace, kotlinName(schema))
+    fun generate(schema: Schema): FileSpec
+        = FileSpec.builder(schema.namespace, kotlinName(schema))
                 .addType(TypeSpec.classBuilder(kotlinName(schema))
                         .addModifiers(KModifier.DATA)
                         .primaryConstructor(buildPrimaryConstructor(schema))
+                        .addProperties(buildPropertySpecs(schema))
                         .addFunction(buildConverterToAvro(schema))
                         .companionObject(TypeSpec.companionObjectBuilder(kotlinName(schema))
                                 .addFunction(buildConverterFromAvro(schema))
                                 .build())
-                        .build()
-                )
+                        .build())
                 .build()
+
+    private fun buildPropertySpecs(schema: Schema): Iterable<PropertySpec>
+        = schemaToFieldNamesAndTypes(schema)
+                .map { (name, type) -> PropertySpec.builder(name, type).initializer(name).build() }
 
     private fun toKotlinType(schema: Schema): TypeName {
         if (isSimpleKotlinType(schema.type)) {
@@ -47,8 +51,7 @@ object KotlinGenerator {
         throw IllegalArgumentException(schema.type.getName());
     }
 
-    private fun isSimpleKotlinType(type: Schema.Type): Boolean
-            = toSimpleKotlinType(type) != null
+    private fun isSimpleKotlinType(type: Schema.Type): Boolean = toSimpleKotlinType(type) != null
 
     private fun toSimpleKotlinType(type: Schema.Type): TypeName? {
         val typeName = when (type) {
@@ -67,8 +70,7 @@ object KotlinGenerator {
         var fieldNames = schema.fields.map { it.name() }
         val fieldList = fieldNames.joinToString(prefix = "(", separator = ", ", postfix = ")")
         val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
-                .returns(javaType(schema))
-                .addStatement("${javaName(schema)}${fieldList}")
+                .addStatement("return ${javaName(schema)}${fieldList}")
                 .build()
         return buildConverterToAvro
     }
@@ -76,23 +78,17 @@ object KotlinGenerator {
     private fun buildConverterFromAvro(schema: Schema): FunSpec {
         val fromAvroSpecificRecordParameterName = schema.name.decapitalize()
         val kotlinConstructorFieldList = schemaToFieldNamesAndTypes(schema)
-                .map { (name, type) ->
-                    val suffix = if (type.nullable) "!!" else ""
-                    "${name} = ${fromAvroSpecificRecordParameterName}.${name}${suffix}"
-                }
+                .map { (name, type) -> "${name} = ${fromAvroSpecificRecordParameterName}.${name}" }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val fromAvroSpecificRecordBuilder = FunSpec.builder("fromAvroSpecificRecord")
-                .returns(Class.forName(fullKotlinName(schema)))
                 .addParameter(fromAvroSpecificRecordParameterName, javaType(schema))
-                .addStatement("${kotlinName(schema)}${kotlinConstructorFieldList}")
+                .addStatement("return ${kotlinName(schema)}${kotlinConstructorFieldList}")
         val fromAvroSpecificRecordFunction = fromAvroSpecificRecordBuilder.build()
         return fromAvroSpecificRecordFunction
     }
 
     private fun javaName(schema: Schema) = schema.name
     private fun kotlinName(schema: Schema) = "${javaName(schema)}Kt"
-    private fun fullJavaName(schema: Schema) = schema.fullName
-    private fun fullKotlinName(schema: Schema) = "${fullJavaName(schema)}Kt"
     private fun javaType(schema: Schema) = Class.forName(schema.fullName)
 
     private fun buildPrimaryConstructor(schema: Schema): FunSpec {
