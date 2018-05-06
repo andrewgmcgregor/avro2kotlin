@@ -21,6 +21,8 @@ protocol ExampleInterface {
 
     long id;
 
+    ExampleNesting exampleNesting;
+
   //    union { null, ExampleEnum } my_enum = null;
 
   //    union { null, ExampleNesting } my_nested_member = null;

@@ -48,6 +48,13 @@ object KotlinGenerator {
             return toSimpleKotlinType(type)!!.asNullable()
         }
 
+        if (schema.type == Schema.Type.RECORD) {
+            println("schema = ${schema}")
+            var fullKotlinName = "${schema.fullName}Kt"
+            println("fullKotlinName = ${fullKotlinName}")
+            return Class.forName(fullKotlinName).asTypeName()
+        }
+
         throw IllegalArgumentException(schema.type.getName());
     }
 

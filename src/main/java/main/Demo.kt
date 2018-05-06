@@ -21,12 +21,15 @@ private fun run() {
     thereAndBackAgain(ExamplePerson(99, null))
 //    thereAndBackAgain(ExamplePerson(null, "user2"))
 
-    thereAndBackAgain2(Example(42, "user1"))
-    thereAndBackAgain2(Example(99, null))
-
-    thereAndBackAgain3(ExampleNesting(false))
-    thereAndBackAgain3(ExampleNesting(true))
+    var falseNesting = ExampleNesting(false)
+    var trueNesting = ExampleNesting(true)
+    thereAndBackAgain3(falseNesting)
+    thereAndBackAgain3(trueNesting)
 //    thereAndBackAgain3(ExampleNesting(null))
+
+    thereAndBackAgain2(Example(42, falseNesting, "user1"))
+    thereAndBackAgain2(Example(99, trueNesting, null))
+
 }
 
 private fun thereAndBackAgain(originalAvroSpecificRecord: ExamplePerson) {
