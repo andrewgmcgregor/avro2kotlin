@@ -96,7 +96,12 @@ object KotlinGenerator {
     private fun buildConverterFromAvro(schema: Schema): FunSpec {
         val fromAvroSpecificRecordParameterName = schema.name.decapitalize()
         val kotlinConstructorFieldList = schemaToFieldNamesAndTypes(schema)
-                .map { (name, type) -> "${name} = ${fromAvroSpecificRecordParameterName}.${name}" }
+                .map {
+                    "${it.name} = " +
+                            "${if (it.minimalTypeSpec.avroType) "${it.minimalTypeSpec.kotlinType}.fromAvroSpecificRecord(" else ""}" +
+                            "${fromAvroSpecificRecordParameterName}.${it.name}" +
+                            "${if (it.minimalTypeSpec.avroType) ")" else ""}"
+                }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val fromAvroSpecificRecordBuilder = FunSpec.builder("fromAvroSpecificRecord")
                 .addParameter(fromAvroSpecificRecordParameterName, javaType(schema))
