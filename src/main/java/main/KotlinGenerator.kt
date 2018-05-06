@@ -4,26 +4,33 @@ import com.squareup.kotlinpoet.*
 import org.apache.avro.Schema
 
 object KotlinGenerator {
-    fun generate(schema: Schema): FileSpec
-        = FileSpec.builder(schema.namespace, kotlinName(schema))
-                .addType(TypeSpec.classBuilder(kotlinName(schema))
-                        .addModifiers(KModifier.DATA)
-                        .primaryConstructor(buildPrimaryConstructor(schema))
-                        .addProperties(buildPropertySpecs(schema))
-                        .addFunction(buildConverterToAvro(schema))
-                        .companionObject(TypeSpec.companionObjectBuilder(kotlinName(schema))
-                                .addFunction(buildConverterFromAvro(schema))
-                                .build())
-                        .build())
-                .build()
+    fun generate(schema: Schema): FileSpec = FileSpec.builder(schema.namespace, kotlinName(schema))
+            .addType(TypeSpec.classBuilder(kotlinName(schema))
+                    .addModifiers(KModifier.DATA)
+                    .primaryConstructor(buildPrimaryConstructor(schema))
+                    .addProperties(buildPropertySpecs(schema))
+                    .addFunction(buildConverterToAvro(schema))
+                    .companionObject(TypeSpec.companionObjectBuilder(kotlinName(schema))
+                            .addFunction(buildConverterFromAvro(schema))
+                            .build())
+                    .build())
+            .build()
 
-    private fun buildPropertySpecs(schema: Schema): Iterable<PropertySpec>
-        = schemaToFieldNamesAndTypes(schema)
-                .map { (name, type) -> PropertySpec.builder(name, type).initializer(name).build() }
+    private fun buildPropertySpecs(schema: Schema): Iterable<PropertySpec> {
+        return schemaToFieldNamesAndTypes(schema)
+                .map { minimalFieldSpec ->
+                    PropertySpec
+                            .builder(name = minimalFieldSpec.name, type = minimalFieldSpec.minimalTypeSpec.kotlinType)
+                            .initializer(minimalFieldSpec.name)
+                            .build()
+                }
+    }
 
-    private fun toKotlinType(schema: Schema): TypeName {
+    private fun toKotlinType(schema: Schema): MinimalTypeSpec {
         if (isSimpleKotlinType(schema.type)) {
-            return toSimpleKotlinType(schema.type)!!
+            return MinimalTypeSpec(
+                    kotlinType = toSimpleKotlinType(schema.type)!!,
+                    avroType = false)
         }
 
         if (schema.type == Schema.Type.UNION) {
@@ -45,14 +52,17 @@ object KotlinGenerator {
                 throw IllegalArgumentException(illegalArgumentMessage)
             }
 
-            return toSimpleKotlinType(type)!!.asNullable()
+            return MinimalTypeSpec(
+                    kotlinType = toSimpleKotlinType(type)!!.asNullable(),
+                    avroType = false)
         }
 
         if (schema.type == Schema.Type.RECORD) {
-            println("schema = ${schema}")
             var fullKotlinName = "${schema.fullName}Kt"
-            println("fullKotlinName = ${fullKotlinName}")
-            return Class.forName(fullKotlinName).asTypeName()
+            var kotlinType = Class.forName(fullKotlinName).asTypeName()
+            return MinimalTypeSpec(
+                    kotlinType = kotlinType,
+                    avroType = true)
         }
 
         throw IllegalArgumentException(schema.type.getName());
@@ -74,10 +84,11 @@ object KotlinGenerator {
     }
 
     private fun buildConverterToAvro(schema: Schema): FunSpec {
-        var fieldNames = schema.fields.map { it.name() }
-        val fieldList = fieldNames.joinToString(prefix = "(", separator = ", ", postfix = ")")
+        var argList = schemaToFieldNamesAndTypes(schema)
+                .map { it.name + if (it.minimalTypeSpec.avroType) ".toAvroSpecificRecord()" else "" }
+                .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
-                .addStatement("return ${javaName(schema)}${fieldList}")
+                .addStatement("return ${javaName(schema)}${argList}")
                 .build()
         return buildConverterToAvro
     }
@@ -100,15 +111,26 @@ object KotlinGenerator {
 
     private fun buildPrimaryConstructor(schema: Schema): FunSpec {
         val primaryConstructorBuilder = FunSpec.constructorBuilder()
-        schemaToFieldNamesAndTypes(schema).forEach { (name, type) -> primaryConstructorBuilder.addParameter(name, type) }
+        schemaToFieldNamesAndTypes(schema).forEach { minimalFieldSpec ->
+            primaryConstructorBuilder.addParameter(minimalFieldSpec.name, minimalFieldSpec.minimalTypeSpec.kotlinType)
+        }
         val primaryConstructor = primaryConstructorBuilder.build()
         return primaryConstructor
     }
 
-    private fun schemaToFieldNamesAndTypes(schema: Schema): List<Pair<String, TypeName>> {
-        var fieldNamesAndTypes = schema.fields
+    private fun schemaToFieldNamesAndTypes(schema: Schema): List<MinimalFieldSpec> {
+        return schema.fields
                 .filterNotNull()
-                .map { field -> Pair(field.name(), toKotlinType(field.schema())) }
-        return fieldNamesAndTypes
+                .map { field ->
+                    MinimalFieldSpec(
+                            name = field.name(),
+                            minimalTypeSpec = toKotlinType(field.schema()))
+                }
     }
+
+    private data class MinimalTypeSpec(val kotlinType: TypeName,
+                                       val avroType: Boolean)
+
+    private data class MinimalFieldSpec(val name: String,
+                                        val minimalTypeSpec: MinimalTypeSpec)
 }

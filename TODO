@@ -1,4 +1,5 @@
 nested types
+nested nullable types
 make it a command line tool
 make it a maven plugin: get the two plugins to play nicely together (or maybe do the avro conversion myself)
 one kotlin file per protocol
