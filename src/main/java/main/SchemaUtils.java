@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class SchemaUtils {
     public static Collection<Schema> getSchemasForAvdl(String resourcePath) {
-        ClassLoader classLoader = KotlinMaker.class.getClassLoader();
+        ClassLoader classLoader = SchemaUtils.class.getClassLoader();
         try (InputStream in = classLoader.getResourceAsStream(resourcePath)) {
             return new Idl(in).ProtocolDeclaration().getTypes();
         } catch (Exception e) {
@@ -17,7 +17,7 @@ public class SchemaUtils {
     }
 
     public static Schema getSchemaForAvsc(String resourcePath) throws Exception {
-        ClassLoader classLoader = KotlinMaker.class.getClassLoader();
+        ClassLoader classLoader = SchemaUtils.class.getClassLoader();
         try (InputStream in = classLoader.getResourceAsStream(resourcePath)) {
             return new Schema.Parser().parse(in);
         } catch (Exception e) {
