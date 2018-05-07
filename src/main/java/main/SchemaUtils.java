@@ -26,7 +26,7 @@ public class SchemaUtils {
         }
     }
 
-    private static <T> T tryOrThrow(Callable<T> value) {
+    public static <T> T tryOrThrow(Callable<T> value) {
         try {
             return value.call();
         } catch (Exception e) {

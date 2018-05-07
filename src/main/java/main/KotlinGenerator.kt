@@ -2,8 +2,30 @@ package main
 
 import com.squareup.kotlinpoet.*
 import org.apache.avro.Schema
+import org.apache.avro.compiler.idl.Idl
+import java.io.File
+import java.io.InputStream
+import java.io.PrintStream
 
 object KotlinGenerator {
+    fun generate(file: File, printStream: PrintStream)
+    {
+        val inputStream = file.inputStream()
+        inputStream.use {
+            generate(inputStream, printStream)
+        }
+    }
+
+    fun generate(inputStream: InputStream, printStream: PrintStream) {
+        try {
+            generate(Schema.Parser().parse(inputStream)).writeTo(printStream)
+        } catch (e: Exception) {
+            Idl(inputStream).CompilationUnit().types
+                    .map { generate(it) }
+                    .forEach { it.writeTo(printStream) }
+        }
+    }
+
     fun generate(schema: Schema): FileSpec = FileSpec.builder(schema.namespace, kotlinName(schema))
             .addType(TypeSpec.classBuilder(kotlinName(schema))
                     .addModifiers(KModifier.DATA)
