@@ -1,12 +1,12 @@
-nested types
-nested nullable types
+separate into two parts: the generator and test code that runs geneated code
 make it a command line tool
 make it a maven plugin: get the two plugins to play nicely together (or maybe do the avro conversion myself)
-one kotlin file per protocol
 
+support enums (needed to be useful for cleanser)
 support arrays
 support maps
-support other types
+support other innerTypes
 
-recursive types
-support multiple non-null types in a union (prob convert to Any/Any?)
+one kotlin file per protocol
+recursive innerTypes
+support multiple non-null innerTypes in a union (prob convert to Any/Any?)

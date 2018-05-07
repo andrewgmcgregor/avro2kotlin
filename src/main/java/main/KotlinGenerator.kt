@@ -34,27 +34,32 @@ object KotlinGenerator {
         }
 
         if (schema.type == Schema.Type.UNION) {
-            val types = schema.types.map { it.type }
             var illegalArgumentMessage = "unions of a single type and null (e.g. union { null, MyRecord })"
 
-            val containsNull = types.contains(Schema.Type.NULL)
+            val innerTypes = schema.types.map { it.type }
+            val containsNull = innerTypes.contains(Schema.Type.NULL)
             if (!containsNull) {
                 throw IllegalArgumentException(illegalArgumentMessage)
             }
 
-            val typesOtherThanNull = types.filterNot { it == Schema.Type.NULL }
+            val typesOtherThanNull = innerTypes.filterNot { it == Schema.Type.NULL }
             if (typesOtherThanNull.size > 1) {
                 throw IllegalArgumentException(illegalArgumentMessage)
             }
 
             var type = typesOtherThanNull.get(0)
-            if (!isSimpleKotlinType(type)) {
-                throw IllegalArgumentException(illegalArgumentMessage)
+            if (isSimpleKotlinType(type)) {
+                return MinimalTypeSpec(
+                        kotlinType = toSimpleKotlinType(type)!!.asNullable(),
+                        avroType = false)
             }
 
-            return MinimalTypeSpec(
-                    kotlinType = toSimpleKotlinType(type)!!.asNullable(),
-                    avroType = false)
+            val innerSchema = schema.types
+                    .filter { it.type != Schema.Type.NULL }
+                    .first()
+            val innerMinimalTypeSpec = toKotlinType(innerSchema)
+            return innerMinimalTypeSpec
+                    .copy(kotlinType = innerMinimalTypeSpec.kotlinType.asNullable())
         }
 
         if (schema.type == Schema.Type.RECORD) {
@@ -85,7 +90,7 @@ object KotlinGenerator {
 
     private fun buildConverterToAvro(schema: Schema): FunSpec {
         var argList = schemaToFieldNamesAndTypes(schema)
-                .map { it.name + if (it.minimalTypeSpec.avroType) ".toAvroSpecificRecord()" else "" }
+                .map { it.name + if (it.minimalTypeSpec.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
                 .addStatement("return ${javaName(schema)}${argList}")
@@ -97,9 +102,11 @@ object KotlinGenerator {
         val fromAvroSpecificRecordParameterName = schema.name.decapitalize()
         val kotlinConstructorFieldList = schemaToFieldNamesAndTypes(schema)
                 .map {
+                    var param = "${fromAvroSpecificRecordParameterName}.${it.name}"
                     "${it.name} = " +
-                            "${if (it.minimalTypeSpec.avroType) "${it.minimalTypeSpec.kotlinType}.fromAvroSpecificRecord(" else ""}" +
-                            "${fromAvroSpecificRecordParameterName}.${it.name}" +
+                            "${if (it.minimalTypeSpec.kotlinType.nullable) "if (${param} == null) null else " else ""}" +
+                            "${if (it.minimalTypeSpec.avroType) "${it.minimalTypeSpec.kotlinType.asNonNullable()}.fromAvroSpecificRecord(" else ""}" +
+                            param +
                             "${if (it.minimalTypeSpec.avroType) ")" else ""}"
                 }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")

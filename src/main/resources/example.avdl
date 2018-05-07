@@ -9,9 +9,9 @@ protocol ExampleInterface {
 
   record ExampleNesting {
 
-//    array<int> counts;
+  //    array<int> counts;
 
-//    union { null, map<string> } attributes= null;
+  //    union { null, map<string> } attributes= null;
 
     boolean isGood;
 
@@ -23,9 +23,9 @@ protocol ExampleInterface {
 
     ExampleNesting exampleNesting;
 
-//    union { null, ExampleEnum } my_enum = null;
+  //    union { null, ExampleEnum } my_enum = null;
 
-//    union { null, ExampleNesting } my_nested_member = null;
+    union { null, ExampleNesting } my_nested_member = null;
 
     union { null, string } guid = null;
   }

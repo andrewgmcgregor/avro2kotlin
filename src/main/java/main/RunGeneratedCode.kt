@@ -3,20 +3,6 @@ package main
 import demo.*
 
 fun main(args: Array<String>) {
-    build()
-    run()
-}
-
-private fun build() {
-    val schemas = mutableListOf(SchemaUtils.getSchemaForAvsc("example.avsc"))
-    schemas.addAll(SchemaUtils.getSchemasForAvdl("example.avdl"))
-
-    schemas
-            .map { schema -> KotlinGenerator.generate(schema) }
-            .forEach { fileSpec -> fileSpec.writeTo(System.out) }
-}
-
-private fun run() {
     thereAndBackAgain(ExamplePerson(42, "user1"))
     thereAndBackAgain(ExamplePerson(99, null))
 //    thereAndBackAgain(ExamplePerson(null, "user2"))
@@ -27,8 +13,9 @@ private fun run() {
     thereAndBackAgain3(trueNesting)
 //    thereAndBackAgain3(ExampleNesting(null))
 
-    thereAndBackAgain2(Example(42, falseNesting, "user1"))
-    thereAndBackAgain2(Example(99, trueNesting, null))
+    thereAndBackAgain2(Example(42, falseNesting, falseNesting, "user1"))
+    thereAndBackAgain2(Example(99, trueNesting, trueNesting, null))
+    thereAndBackAgain2(Example(99, trueNesting, null, null))
 
 }
 
