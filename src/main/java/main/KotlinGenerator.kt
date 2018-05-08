@@ -8,29 +8,29 @@ import java.io.InputStream
 import java.io.PrintStream
 
 object KotlinGenerator {
-    fun generate(schemaFilename: String, printStream: PrintStream)
+    fun generateFromFile(schemaFilename: String, printStream: PrintStream)
     {
         val file = File(schemaFilename)
         val inputStream = file.inputStream()
         inputStream.use {
             when {
-                schemaFilename.endsWith(".avsc") -> generateAvsc(inputStream, printStream)
-                schemaFilename.endsWith(".avdl") -> generateAvdl(inputStream, printStream)
+                schemaFilename.endsWith(".avsc") -> generateFromAvsc(inputStream, printStream)
+                schemaFilename.endsWith(".avdl") -> generateFromAvdl(inputStream, printStream)
             }
         }
     }
 
-    fun generateAvsc(inputStream: InputStream, printStream: PrintStream) {
-        generate(Schema.Parser().parse(inputStream)).writeTo(printStream)
+    fun generateFromAvsc(inputStream: InputStream, printStream: PrintStream) {
+        generateFromSchema(Schema.Parser().parse(inputStream)).writeTo(printStream)
     }
 
-    fun generateAvdl(inputStream: InputStream, printStream: PrintStream) {
+    fun generateFromAvdl(inputStream: InputStream, printStream: PrintStream) {
         Idl(inputStream).CompilationUnit().types
-                .map { generate(it) }
+                .map { generateFromSchema(it) }
                 .forEach { it.writeTo(printStream) }
     }
 
-    fun generate(schema: Schema): FileSpec = FileSpec.builder(schema.namespace, kotlinName(schema))
+    fun generateFromSchema(schema: Schema): FileSpec = FileSpec.builder(schema.namespace, kotlinName(schema))
             .addType(TypeSpec.classBuilder(kotlinName(schema))
                     .addModifiers(KModifier.DATA)
                     .primaryConstructor(buildPrimaryConstructor(schema))
