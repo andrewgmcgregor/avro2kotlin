@@ -1,5 +1,6 @@
-separate into two parts: the generator and test code that runs geneated code
-make it a command line tool
+generate the java code along with the kotlin code to the current directory
+work out the output filename
+configure which directory you send it to
 make it a maven plugin: get the two plugins to play nicely together (or maybe do the avro conversion myself)
 
 support enums (needed to be useful for cleanser)
@@ -10,3 +11,4 @@ support other innerTypes
 one kotlin file per protocol
 recursive innerTypes
 support multiple non-null innerTypes in a union (prob convert to Any/Any?)
+serde, hiding the avro type
