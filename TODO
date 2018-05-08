@@ -13,3 +13,5 @@ one kotlin file per protocol
 recursive innerTypes
 support multiple non-null innerTypes in a union (prob convert to Any/Any?)
 serde, hiding the avro type
+
+make the output classes easy to read and understand: hide converter methods in a factory
