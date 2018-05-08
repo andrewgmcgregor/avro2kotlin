@@ -43,6 +43,7 @@ public class KotlinIDLProtocolMojo extends IDLProtocolMojo {
 
         @Override
         protected void doCompile(String filename, File sourceDirectory, File outputDirectory) throws IOException {
+            super.doCompile(filename, sourceDirectory, outputDirectory);
             try {
                 @SuppressWarnings("rawtypes")
                 List runtimeClasspathElements = project.getRuntimeClasspathElements();

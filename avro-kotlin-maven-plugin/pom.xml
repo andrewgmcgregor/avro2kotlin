@@ -64,6 +64,12 @@
             <artifactId>avro-compiler</artifactId>
             <version>${avro.version}</version>
         </dependency>
+        <dependency>
+        <groupId>org.apache.avro</groupId>
+            <artifactId>avro-maven-plugin</artifactId>
+            <version>${avro.version}</version>
+        </dependency>
+
         <!-- test-->
         <dependency>
             <groupId>org.apache.maven</groupId>
