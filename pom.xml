@@ -7,15 +7,29 @@
 
     <groupId>avro2kotlin</groupId>
     <artifactId>avro2kotlin</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>avro-kotlin-maven-plugin</module>
+    </modules>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <kotlin.version>1.2.41</kotlin.version>
+        <maven.version>2.0.10</maven.version>
+        <plugin-plugin.version>3.3</plugin-plugin.version>
+        <file-management.version>1.2.1</file-management.version>
+        <avro.version>1.8.2</avro.version>
     </properties>
 
     <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>avro2kotlin</groupId>-->
+            <!--<artifactId>avro-kotlin-maven-plugin</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro-tools</artifactId>
@@ -120,15 +134,14 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro-maven-plugin</artifactId>
-                <version>1.8.2</version>
+                <groupId>avro2kotlin</groupId>
+                <artifactId>avro-kotlin-maven-plugin</artifactId>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>schema</goal>
-                            <goal>idl-protocol</goal>
+                            <goal>kotlin-idl-protocol</goal>
                         </goals>
                         <configuration>
                             <stringType>String</stringType>
