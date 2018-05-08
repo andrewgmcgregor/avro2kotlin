@@ -8,8 +8,7 @@ import java.io.InputStream
 import java.io.PrintStream
 
 object KotlinGenerator {
-    fun generateFromFile(schemaFilename: String, printStream: PrintStream)
-    {
+    fun generateFromFile(schemaFilename: String, printStream: PrintStream) {
         val file = File(schemaFilename)
         val inputStream = file.inputStream()
         inputStream.use {
@@ -21,26 +20,34 @@ object KotlinGenerator {
     }
 
     fun generateFromAvsc(inputStream: InputStream, printStream: PrintStream) {
-        generateFromSchema(Schema.Parser().parse(inputStream)).writeTo(printStream)
+        val schema = Schema.Parser().parse(inputStream)
+        generateFromSchema(listOf(schema), schema.namespace, schema.name)
+                .writeTo(printStream)
     }
 
     fun generateFromAvdl(inputStream: InputStream, printStream: PrintStream) {
-        Idl(inputStream).CompilationUnit().types
-                .map { generateFromSchema(it) }
-                .forEach { it.writeTo(printStream) }
+        val compilationUnit = Idl(inputStream).CompilationUnit()
+        val schemas = compilationUnit.types
+        generateFromSchema(schemas, compilationUnit.namespace, compilationUnit.name)
+                .writeTo(printStream)
     }
 
-    fun generateFromSchema(schema: Schema): FileSpec = FileSpec.builder(schema.namespace, kotlinName(schema))
-            .addType(TypeSpec.classBuilder(kotlinName(schema))
+    fun generateFromSchema(schemas: Collection<Schema>, namespace: String, name: String): FileSpec {
+        val builder = FileSpec.builder(namespace, name)
+        schemas.forEach { schema ->
+            val fileName = kotlinName(schema)
+            builder.addType(TypeSpec.classBuilder(fileName)
                     .addModifiers(KModifier.DATA)
                     .primaryConstructor(buildPrimaryConstructor(schema))
                     .addProperties(buildPropertySpecs(schema))
                     .addFunction(buildConverterToAvro(schema))
-                    .companionObject(TypeSpec.companionObjectBuilder(kotlinName(schema))
+                    .companionObject(TypeSpec.companionObjectBuilder(fileName)
                             .addFunction(buildConverterFromAvro(schema))
                             .build())
                     .build())
-            .build()
+        }
+        return builder.build()
+    }
 
     private fun buildPropertySpecs(schema: Schema): Iterable<PropertySpec> {
         return schemaToFieldNamesAndTypes(schema)
@@ -89,10 +96,8 @@ object KotlinGenerator {
         }
 
         if (schema.type == Schema.Type.RECORD) {
-            var fullKotlinName = "${schema.fullName}Kt"
-            var kotlinType = Class.forName(fullKotlinName).asTypeName()
             return MinimalTypeSpec(
-                    kotlinType = kotlinType,
+                    kotlinType = ClassName(schema.namespace, schema.name),
                     avroType = true)
         }
 

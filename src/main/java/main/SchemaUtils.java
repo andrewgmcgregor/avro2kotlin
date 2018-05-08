@@ -18,8 +18,7 @@ public class SchemaUtils {
     }
 
     public static <R> R getSchemaForAvsc(String resourcePath, Function<InputStream, R> f) throws Exception {
-        ClassLoader classLoader = SchemaUtils.class.getClassLoader();
-        try (InputStream in = classLoader.getResourceAsStream(resourcePath)) {
+        try (InputStream in = ClassLoader.getSystemResourceAsStream(resourcePath)) {
             return f.apply(in);
         } catch (Exception e) {
             throw new RuntimeException(e);
