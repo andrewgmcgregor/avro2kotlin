@@ -1,3 +1,4 @@
+get it to work without havign pre-generated the files
 generate the java code along with the kotlin code to the current directory
 work out the output filename
 configure which directory you send it to

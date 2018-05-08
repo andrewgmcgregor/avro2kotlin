@@ -8,22 +8,26 @@ import java.io.InputStream
 import java.io.PrintStream
 
 object KotlinGenerator {
-    fun generate(file: File, printStream: PrintStream)
+    fun generate(schemaFilename: String, printStream: PrintStream)
     {
+        val file = File(schemaFilename)
         val inputStream = file.inputStream()
         inputStream.use {
-            generate(inputStream, printStream)
+            when {
+                schemaFilename.endsWith(".avsc") -> generateAvsc(inputStream, printStream)
+                schemaFilename.endsWith(".avdl") -> generateAvdl(inputStream, printStream)
+            }
         }
     }
 
-    fun generate(inputStream: InputStream, printStream: PrintStream) {
-        try {
-            generate(Schema.Parser().parse(inputStream)).writeTo(printStream)
-        } catch (e: Exception) {
-            Idl(inputStream).CompilationUnit().types
-                    .map { generate(it) }
-                    .forEach { it.writeTo(printStream) }
-        }
+    fun generateAvsc(inputStream: InputStream, printStream: PrintStream) {
+        generate(Schema.Parser().parse(inputStream)).writeTo(printStream)
+    }
+
+    fun generateAvdl(inputStream: InputStream, printStream: PrintStream) {
+        Idl(inputStream).CompilationUnit().types
+                .map { generate(it) }
+                .forEach { it.writeTo(printStream) }
     }
 
     fun generate(schema: Schema): FileSpec = FileSpec.builder(schema.namespace, kotlinName(schema))
