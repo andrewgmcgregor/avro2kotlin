@@ -1,6 +1,7 @@
-generate kotlin from schema files as well
 show it working with a kstream in the demo
+generate kotlin from schema files as well
 
+make the smoke test 3 real tests
 support enums (needed to be useful for cleanser)
 support arrays
 support maps
@@ -14,4 +15,3 @@ serde, hiding the avro type
 make the output classes easy to read and understand: hide converter methods in a factory
 
 standalone converter tool: configure which directory you send it to
-
