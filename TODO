@@ -1,5 +1,3 @@
-work out the output filename
-configure which directory you send it to
 generate kotlin from schema files as well
 show it working with a kstream in the demo
 
@@ -14,3 +12,6 @@ support multiple non-null innerTypes in a union (prob convert to Any/Any?)
 serde, hiding the avro type
 
 make the output classes easy to read and understand: hide converter methods in a factory
+
+standalone converter tool: configure which directory you send it to
+

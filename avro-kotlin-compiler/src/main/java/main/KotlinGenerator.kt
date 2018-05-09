@@ -5,34 +5,34 @@ import org.apache.avro.Schema
 import org.apache.avro.compiler.idl.Idl
 import java.io.File
 import java.io.InputStream
-import java.io.PrintStream
 
 object KotlinGenerator {
-    fun generateFromFile(schemaFilename: String, printStream: PrintStream) {
+    fun generateFromFile(schemaFilename: String): FileSpec {
         val file = File(schemaFilename)
         val inputStream = file.inputStream()
         inputStream.use {
             when {
-                schemaFilename.endsWith(".avsc") -> generateFromAvsc(inputStream, printStream)
-                schemaFilename.endsWith(".avdl") -> generateFromAvdl(inputStream, printStream)
+                schemaFilename.endsWith(".avsc") -> return generateFromAvsc(inputStream)
+                schemaFilename.endsWith(".avdl") -> return generateFromAvdl(inputStream)
+                else -> throw IllegalArgumentException("expected file ending in .avsc or .avdl")
             }
         }
     }
 
-    fun generateFromAvsc(inputStream: InputStream, printStream: PrintStream) {
+    fun generateFromAvsc(inputStream: InputStream): FileSpec {
         val schema = Schema.Parser().parse(inputStream)
-        generateFromSchema(listOf(schema), schema.namespace, schema.name)
-                .writeTo(printStream)
+        val fileSpec = generateFromSchemas(listOf(schema), schema.namespace, schema.name)
+        return fileSpec
     }
 
-    fun generateFromAvdl(inputStream: InputStream, printStream: PrintStream) {
+    fun generateFromAvdl(inputStream: InputStream): FileSpec {
         val compilationUnit = Idl(inputStream).CompilationUnit()
         val schemas = compilationUnit.types
-        val fileSpec = generateFromSchema(schemas, compilationUnit.namespace, compilationUnit.name)
-        fileSpec.writeTo(printStream)
+        val fileSpec = generateFromSchemas(schemas, compilationUnit.namespace, compilationUnit.name)
+        return fileSpec
     }
 
-    fun generateFromSchema(schemas: Collection<Schema>, namespace: String, name: String): FileSpec {
+    fun generateFromSchemas(schemas: Collection<Schema>, namespace: String, name: String): FileSpec {
         val builder = FileSpec.builder(namespace, name)
         schemas.forEach { schema ->
             val fileName = kotlinName(schema)

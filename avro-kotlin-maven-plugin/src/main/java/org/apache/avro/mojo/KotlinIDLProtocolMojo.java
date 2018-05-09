@@ -1,5 +1,6 @@
 package org.apache.avro.mojo;
 
+import com.squareup.kotlinpoet.FileSpec;
 import main.KotlinGenerator;
 import main.SchemaUtils;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +39,14 @@ public class KotlinIDLProtocolMojo extends AbstractAvroMojo {
     @Override
     protected void doCompile(String filename, File sourceDirectory, File outputDirectory) throws IOException {
         File inputFile = getInputFile(filename, sourceDirectory);
-        PrintStream outputStream = SchemaUtils.tryOrThrow(() -> getOutputStream(outputDirectory));
-        KotlinGenerator.INSTANCE.generateFromFile(inputFile.getAbsolutePath(), outputStream);
+        FileSpec fileSpec = KotlinGenerator.INSTANCE.generateFromFile(inputFile.getAbsolutePath());
+
+        String outputFilename = fileSpec.getName();
+        String outputDirectoryWithPackage = outputDirectory.getAbsolutePath() + "/" + fileSpec.getPackageName().replace('.', '/');
+        PrintStream outputStream = SchemaUtils.tryOrThrow(() -> getOutputStream(
+                outputFilename + ".kt",
+                new File(outputDirectoryWithPackage)));
+        fileSpec.writeTo(outputStream);
     }
 
     @NotNull
@@ -49,9 +56,9 @@ public class KotlinIDLProtocolMojo extends AbstractAvroMojo {
     }
 
     @NotNull
-    private static PrintStream getOutputStream(File outputDirectory) throws Exception {
+    private static PrintStream getOutputStream(String filename, File outputDirectory) throws Exception {
         outputDirectory.mkdirs();
-        return new PrintStream(new File(outputDirectory.getAbsolutePath() + "/GeneratedCode.kt"));
+        return new PrintStream(new File(outputDirectory.getAbsolutePath() + "/" + filename));
     }
 
     @Override

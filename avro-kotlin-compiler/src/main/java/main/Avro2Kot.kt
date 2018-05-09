@@ -12,6 +12,8 @@ fun main(args: Array<String>) {
     }
 
     val schemaFilename = args[0]
-    val parseOut = PrintStream(FileOutputStream("GeneratedCode.kt"))
-    main.KotlinGenerator.generateFromFile(schemaFilename, parseOut)
+    val fileSpec = main.KotlinGenerator.generateFromFile(schemaFilename)
+
+    val parseOut = PrintStream(FileOutputStream(fileSpec.name))
+    fileSpec.writeTo(parseOut)
 }
