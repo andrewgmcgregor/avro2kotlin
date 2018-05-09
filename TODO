@@ -1,7 +1,7 @@
-generate the java code along with the kotlin code to the current directory
 work out the output filename
 configure which directory you send it to
-make it a maven plugin: get the two plugins to play nicely together (or maybe do the avro conversion myself)
+generate kotlin from schema files as well
+show it working with a kstream in the demo
 
 support enums (needed to be useful for cleanser)
 support arrays

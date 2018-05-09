@@ -28,8 +28,8 @@ object KotlinGenerator {
     fun generateFromAvdl(inputStream: InputStream, printStream: PrintStream) {
         val compilationUnit = Idl(inputStream).CompilationUnit()
         val schemas = compilationUnit.types
-        generateFromSchema(schemas, compilationUnit.namespace, compilationUnit.name)
-                .writeTo(printStream)
+        val fileSpec = generateFromSchema(schemas, compilationUnit.namespace, compilationUnit.name)
+        fileSpec.writeTo(printStream)
     }
 
     fun generateFromSchema(schemas: Collection<Schema>, namespace: String, name: String): FileSpec {
@@ -97,7 +97,7 @@ object KotlinGenerator {
 
         if (schema.type == Schema.Type.RECORD) {
             return MinimalTypeSpec(
-                    kotlinType = ClassName(schema.namespace, schema.name),
+                    kotlinType = kotlinType(schema),
                     avroType = true)
         }
 
@@ -150,7 +150,21 @@ object KotlinGenerator {
 
     private fun javaName(schema: Schema) = schema.name
     private fun kotlinName(schema: Schema) = "${javaName(schema)}Kt"
-    private fun javaType(schema: Schema) = Class.forName(schema.fullName)
+    private fun javaType(schema: Schema): TypeName {
+        println("schema.namespace = ${schema.namespace}")
+        println("schema.namespace = ${schema.name}")
+        val className = ClassName(schema.namespace, schema.name)
+        println("className = ${className}")
+        return className
+    }
+    private fun kotlinType(schema: Schema): TypeName {
+        println("schema.namespace = ${schema.namespace}")
+        val kotlinName = "${schema.name}Kt"
+        println("kotlinName = ${kotlinName}")
+        val className = ClassName(schema.namespace, kotlinName)
+        println("className = ${className}")
+        return className
+    }
 
     private fun buildPrimaryConstructor(schema: Schema): FunSpec {
         val primaryConstructorBuilder = FunSpec.constructorBuilder()
