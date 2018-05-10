@@ -1,12 +1,9 @@
-get rid avro folder with example schemas from avro-kotlin-compiler module
-
 make the smoke test 3 real tests
 support enums (needed to be useful for cleanser)
 support arrays
 support maps
 support other innerTypes
 
-one kotlin file per protocol
 recursive innerTypes
 support multiple non-null innerTypes in a union (prob convert to Any/Any?)
 serde, hiding the avro type
