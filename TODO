@@ -1,6 +1,6 @@
-show it working with a kstream in the demo
-generate kotlin from schema files as well
+show writing kotlin messages to kafka
 
+generate kotlin from schema files as well
 make the smoke test 3 real tests
 support enums (needed to be useful for cleanser)
 support arrays
@@ -14,4 +14,5 @@ serde, hiding the avro type
 
 make the output classes easy to read and understand: hide converter methods in a factory
 
+get the tests to run without a real kafka broker
 standalone converter tool: configure which directory you send it to
