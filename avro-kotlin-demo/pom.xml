@@ -24,6 +24,16 @@
             <artifactId>avro-kotlin-compiler</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-streams-avro-serde</artifactId>
+            <version>4.0.0</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
