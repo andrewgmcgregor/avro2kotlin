@@ -25,7 +25,7 @@ public class KotlinIDLProtocolMojo extends AbstractAvroMojo {
      *
      * @parameter
      */
-    private String[] includes = new String[]{"**/*.avdl"};
+    private String[] includes = new String[]{"**/*.avdl", "**/*.avsc"};
 
     /**
      * A set of Ant-like inclusion patterns used to select files from the source
@@ -34,7 +34,7 @@ public class KotlinIDLProtocolMojo extends AbstractAvroMojo {
      *
      * @parameter
      */
-    private String[] testIncludes = new String[]{"**/*.avdl"};
+    private String[] testIncludes = new String[]{"**/*.avdl", "**/*.avsc"};
 
     @Override
     protected void doCompile(String filename, File sourceDirectory, File outputDirectory) throws IOException {

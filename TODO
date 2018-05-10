@@ -1,4 +1,4 @@
-generate kotlin from schema files as well
+generate java classes without needing to add the plugin explicitly
 
 make the smoke test 3 real tests
 support enums (needed to be useful for cleanser)
@@ -11,6 +11,7 @@ recursive innerTypes
 support multiple non-null innerTypes in a union (prob convert to Any/Any?)
 serde, hiding the avro type
 
+remove the avro-maven-plugin source from my codebase - use it as a dependency instead
 make the output classes easy to read and understand: hide converter methods in a factory
 
 get the tests to run without a real kafka broker
