@@ -1,4 +1,4 @@
-generate java classes without needing to add the plugin explicitly
+get rid avro folder with example schemas from avro-kotlin-compiler module
 
 make the smoke test 3 real tests
 support enums (needed to be useful for cleanser)

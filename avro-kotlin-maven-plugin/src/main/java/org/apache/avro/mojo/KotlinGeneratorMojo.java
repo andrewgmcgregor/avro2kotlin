@@ -10,14 +10,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 /**
- * Generate Kotlin classes and interfaces from AvroIDL files (.avdl)
+ * Generate Kotlin classes and interfaces
  *
- * @goal kotlin-idl-protocol
+ * @goal kotlin-generator
  * @requiresDependencyResolution runtime
  * @phase generate-sources
  * @threadSafe
  */
-public class KotlinIDLProtocolMojo extends AbstractAvroMojo {
+public class KotlinGeneratorMojo extends AbstractAvroMojo {
     /**
      * A set of Ant-like inclusion patterns used to select files from the source
      * directory for processing. By default, the pattern
