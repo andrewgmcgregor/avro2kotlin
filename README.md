@@ -1,5 +1,6 @@
 ## run demo stream
-* kafka-topics --zookeeper localhost:2181 --create --partitions 1 --replication-factor 1 --topic foo
+* kafka-topics --zookeeper localhost:2181 --create --partitions 1 --replication-factor 1 --topic examplesFromProducer
+* kafka-topics --zookeeper localhost:2181 --create --partitions 1 --replication-factor 1 --topic exampleNestingsFromKStream
 * run AvroBasedExampleProducer
 * run AvroStreamProcessor
 ---

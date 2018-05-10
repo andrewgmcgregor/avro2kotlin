@@ -11,8 +11,10 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import java.util.*
 
+val PRODUCER_OUTPUT_TOPIC = "examplesFromProducer"
+
 fun main(args: Array<String>) {
-    AvroBasedExampleProducer.runProducer(3, "foo", 2)
+    AvroBasedExampleProducer.runProducer(3, PRODUCER_OUTPUT_TOPIC, 2)
 }
 
 object AvroBasedExampleProducer {

@@ -2,6 +2,8 @@ package main
 
 import demo.Example
 import demo.ExampleKt
+import demo.ExampleNesting
+import demo.ExampleNestingKt
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.common.serialization.Serdes
@@ -9,6 +11,8 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig.*
 import java.util.*
+
+val KSTREAM_OUTPUT_TOPIC = "exampleNestingsFromKStream"
 
 fun main(args: Array<String>) {
     val config = Properties()
@@ -22,9 +26,12 @@ fun main(args: Array<String>) {
 
     val builder = StreamsBuilder()
 
-    builder.stream<String, Example>("foo")
+    builder.stream<String, Example>(PRODUCER_OUTPUT_TOPIC)
             .mapValues { value -> ExampleKt.fromAvroSpecificRecord(value) }
-            .foreach { key, value -> println("${key} = ${value}") }
+            .peek { key, value -> println("${key} = ${value}") }
+            .mapValues { it.exampleNesting }
+            .mapValues { it.toAvroSpecificRecord() }
+            .to(KSTREAM_OUTPUT_TOPIC)
 
     val kafkaStreams = KafkaStreams(builder.build(), config)
     kafkaStreams.start()

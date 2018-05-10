@@ -1,6 +1,5 @@
-show writing kotlin messages to kafka
-
 generate kotlin from schema files as well
+
 make the smoke test 3 real tests
 support enums (needed to be useful for cleanser)
 support arrays
