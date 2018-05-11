@@ -1,5 +1,4 @@
-make the smoke test 3 real tests
-support enums (needed to be useful for cleanser)
+add converters to generated kotlin enum
 support arrays
 support maps
 support other innerTypes

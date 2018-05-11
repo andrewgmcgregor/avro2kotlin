@@ -2,7 +2,7 @@ package org.apache.avro.mojo;
 
 import com.squareup.kotlinpoet.FileSpec;
 import main.KotlinGenerator;
-import main.SchemaUtils;
+import main.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class KotlinGeneratorMojo extends AbstractAvroMojo {
 
         String outputFilename = fileSpec.getName();
         String outputDirectoryWithPackage = outputDirectory.getAbsolutePath() + "/" + fileSpec.getPackageName().replace('.', '/');
-        PrintStream outputStream = SchemaUtils.tryOrThrow(() -> getOutputStream(
+        PrintStream outputStream = Utils.tryOrThrow(() -> getOutputStream(
                 outputFilename + ".kt",
                 new File(outputDirectoryWithPackage)));
         fileSpec.writeTo(outputStream);
