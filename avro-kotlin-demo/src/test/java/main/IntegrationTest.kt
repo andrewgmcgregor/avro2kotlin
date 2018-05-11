@@ -1,8 +1,6 @@
 package main
 
-import demo.Example
-import demo.ExampleNesting
-import demo.ExamplePerson
+import demo.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -23,9 +21,9 @@ class IntegrationTest {
         val falseNesting = ExampleNesting(false)
         val trueNesting = ExampleNesting(true)
         val examples = listOf(
-                Example(42, falseNesting, falseNesting, "user1"),
-                Example(99, trueNesting, trueNesting, null),
-                Example(99, trueNesting, null, null))
+                Example(42, falseNesting, ExampleEnum.FOO, falseNesting, "user1"),
+                Example(99, trueNesting, ExampleEnum.BAR, trueNesting, null),
+                Example(99, trueNesting, ExampleEnum.BAZ, null, null))
 
         examples.forEach { assertThat(convertExampleThereAndBackAgain(it), `is`(it)) }
     }

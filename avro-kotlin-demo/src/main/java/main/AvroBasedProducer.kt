@@ -1,6 +1,7 @@
 package main
 
 import demo.Example
+import demo.ExampleEnumKt
 import demo.ExampleKt
 import demo.ExampleNestingKt
 import io.confluent.kafka.serializers.KafkaAvroSerializer
@@ -32,7 +33,8 @@ object AvroBasedExampleProducer {
                         id = index.toLong(),
                         exampleNesting = ExampleNestingKt(index == 0),
                         my_nested_member = if (index == 0) null else ExampleNestingKt(true),
-                        guid = "name-$favoriteColour")
+                        guid = "name-$favoriteColour",
+                        my_enum = ExampleEnumKt.values().get(index % ExampleEnumKt.values().size))
                 val record = ProducerRecord(
                         outputTopic,
                         "" + index,

@@ -32,19 +32,28 @@ object KotlinGenerator {
         return fileSpec
     }
 
-    fun generateFromSchemas(schemas: Collection<Schema>, namespace: String, name: String): FileSpec {
+    fun generateFromSchemas(schemas: Collection<Schema>,
+                            namespace: String,
+                            name: String): FileSpec {
         val builder = FileSpec.builder(namespace, name)
         schemas.forEach { schema ->
-            val fileName = kotlinName(schema)
-            builder.addType(TypeSpec.classBuilder(fileName)
-                    .addModifiers(KModifier.DATA)
-                    .primaryConstructor(buildPrimaryConstructor(schema))
-                    .addProperties(buildPropertySpecs(schema))
-                    .addFunction(buildConverterToAvro(schema))
-                    .companionObject(TypeSpec.companionObjectBuilder(fileName)
-                            .addFunction(buildConverterFromAvro(schema))
-                            .build())
-                    .build())
+            if (schema.type == Schema.Type.RECORD) {
+                val fileName = kotlinName(schema)
+                builder.addType(TypeSpec.classBuilder(fileName)
+                        .addModifiers(KModifier.DATA)
+                        .primaryConstructor(buildPrimaryConstructor(schema))
+                        .addProperties(buildPropertySpecs(schema))
+                        .addFunction(buildConverterToAvro(schema))
+                        .companionObject(TypeSpec.companionObjectBuilder(fileName)
+                                .addFunction(buildConverterFromAvro(schema))
+                                .build())
+                        .build())
+            } else if (schema.type == Schema.Type.ENUM) {
+                val enumName = kotlinName(schema)
+                val enumBuilder = TypeSpec.enumBuilder(enumName)
+                schema.enumSymbols.forEach { symbol -> enumBuilder.addEnumConstant(symbol) }
+                builder.addType(enumBuilder.build())
+            }
         }
         return builder.build()
     }
@@ -101,6 +110,14 @@ object KotlinGenerator {
                     avroType = true)
         }
 
+        if (schema.type == Schema.Type.ENUM) {
+            val kotlinType = kotlinType(schema)
+            return MinimalTypeSpec(
+                    kotlinType = kotlinType,
+                    avroType = true
+            )
+        }
+
         throw IllegalArgumentException(schema.type.getName());
     }
 
@@ -151,18 +168,12 @@ object KotlinGenerator {
     private fun javaName(schema: Schema) = schema.name
     private fun kotlinName(schema: Schema) = "${javaName(schema)}Kt"
     private fun javaType(schema: Schema): TypeName {
-        println("schema.namespace = ${schema.namespace}")
-        println("schema.namespace = ${schema.name}")
         val className = ClassName(schema.namespace, schema.name)
-        println("className = ${className}")
         return className
     }
     private fun kotlinType(schema: Schema): TypeName {
-        println("schema.namespace = ${schema.namespace}")
         val kotlinName = "${schema.name}Kt"
-        println("kotlinName = ${kotlinName}")
         val className = ClassName(schema.namespace, kotlinName)
-        println("className = ${className}")
         return className
     }
 
