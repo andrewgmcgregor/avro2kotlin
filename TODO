@@ -1,14 +1,13 @@
 add converters to generated kotlin enum
+serde, hiding the java type
+
 support arrays
 support maps
 support other innerTypes
-
 recursive innerTypes
 support multiple non-null innerTypes in a union (prob convert to Any/Any?)
-serde, hiding the avro type
 
 remove the avro-maven-plugin source from my codebase - use it as a dependency instead
 make the output classes easy to read and understand: hide converter methods in a factory
 
-get the tests to run without a real kafka broker
-standalone converter tool: configure which directory you send it to
+get the integration tests to run without a real kafka broker
