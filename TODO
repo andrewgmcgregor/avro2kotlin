@@ -1,4 +1,5 @@
 add converters to generated kotlin enum
+serde (so you dont need to map to the kotlin version)
 serde, hiding the java type
 
 support arrays

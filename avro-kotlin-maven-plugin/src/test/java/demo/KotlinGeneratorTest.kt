@@ -1,7 +1,8 @@
 package demo
 
 import main.KotlinGenerator
-import org.junit.Assert.assertTrue
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class KotlinGeneratorTest {
@@ -17,10 +18,12 @@ protocol ExampleInterface {
   }
 }
         """
-        val generatedCode = StringBuilder()
-        KotlinGenerator.generateFromAvdl(testProtocol.byteInputStream()).writeTo(generatedCode)
-        println("generatedCode = ${generatedCode}")
-        assertTrue(generatedCode.contains("testEnum"))
+        val generatedCodeCollector = StringBuilder()
+        KotlinGenerator.generateFromAvdl(testProtocol.byteInputStream()).writeTo(generatedCodeCollector)
+        val generatedCode = generatedCodeCollector.toString()
+        assertThat(generatedCode, containsString("testEnum"))
+        assertThat(generatedCode, containsString("fun toAvroSpecificRecord() = TestEnum"))
+        assertThat(generatedCode, containsString("fun fromAvroSpecificRecord(testEnum: TestEnum)"))
     }
 
 }

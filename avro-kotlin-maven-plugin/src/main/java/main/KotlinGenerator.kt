@@ -49,10 +49,25 @@ object KotlinGenerator {
                                 .build())
                         .build())
             } else if (schema.type == Schema.Type.ENUM) {
+                val javaEnumName = javaName(schema)
                 val enumName = kotlinName(schema)
                 val enumBuilder = TypeSpec.enumBuilder(enumName)
                 schema.enumSymbols.forEach { symbol -> enumBuilder.addEnumConstant(symbol) }
-                builder.addType(enumBuilder.build())
+                builder.addType(enumBuilder
+                        .addFunction(FunSpec.builder("toAvroSpecificRecord")
+                                .addStatement("return $javaEnumName.valueOf(this.name)")
+                                .build())
+                        .build())
+
+                val fromAvroSpecificRecordParameterName = schema.name.decapitalize()
+                builder.addType(TypeSpec.objectBuilder(enumName)
+                        .addFunction(FunSpec.builder("fromAvroSpecificRecord")
+                                .addParameter(fromAvroSpecificRecordParameterName, javaType(schema))
+                                .addStatement("return ${kotlinName(schema)}.valueOf(${fromAvroSpecificRecordParameterName}.name)")
+                                .build()
+                        )
+                        .build())
+
             }
         }
         return builder.build()
@@ -158,11 +173,10 @@ object KotlinGenerator {
                             "${if (it.minimalTypeSpec.avroType) ")" else ""}"
                 }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
-        val fromAvroSpecificRecordBuilder = FunSpec.builder("fromAvroSpecificRecord")
+        return FunSpec.builder("fromAvroSpecificRecord")
                 .addParameter(fromAvroSpecificRecordParameterName, javaType(schema))
                 .addStatement("return ${kotlinName(schema)}${kotlinConstructorFieldList}")
-        val fromAvroSpecificRecordFunction = fromAvroSpecificRecordBuilder.build()
-        return fromAvroSpecificRecordFunction
+                .build()
     }
 
     private fun javaName(schema: Schema) = schema.name
@@ -171,6 +185,7 @@ object KotlinGenerator {
         val className = ClassName(schema.namespace, schema.name)
         return className
     }
+
     private fun kotlinType(schema: Schema): TypeName {
         val kotlinName = "${schema.name}Kt"
         val className = ClassName(schema.namespace, kotlinName)
