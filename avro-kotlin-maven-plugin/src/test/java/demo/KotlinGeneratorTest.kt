@@ -23,7 +23,8 @@ protocol ExampleInterface {
         val generatedCode = generatedCodeCollector.toString()
         assertThat(generatedCode, containsString("testEnum"))
         assertThat(generatedCode, containsString("fun toAvroSpecificRecord() = TestEnum"))
-        assertThat(generatedCode, containsString("fun fromAvroSpecificRecord(testEnum: TestEnum)"))
+        assertThat(generatedCode, containsString("fun KClass<TestEnumKt>.fromAvroSpecificRecord(testEnum: TestEnum)"))
+        println(generatedCode)
     }
 
 }

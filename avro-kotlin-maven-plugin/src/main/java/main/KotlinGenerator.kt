@@ -50,7 +50,7 @@ object KotlinGenerator {
                         .build())
             } else if (schema.type == Schema.Type.ENUM) {
                 val javaEnumName = javaName(schema)
-                val enumName = kotlinName(schema)
+                val enumName: String = kotlinName(schema)
                 val enumBuilder = TypeSpec.enumBuilder(enumName)
                 schema.enumSymbols.forEach { symbol -> enumBuilder.addEnumConstant(symbol) }
                 builder.addType(enumBuilder
@@ -60,13 +60,15 @@ object KotlinGenerator {
                         .build())
 
                 val fromAvroSpecificRecordParameterName = schema.name.decapitalize()
-                builder.addType(TypeSpec.objectBuilder(enumName)
-                        .addFunction(FunSpec.builder("fromAvroSpecificRecord")
+                builder//.addType(TypeSpec.classBuilder(name = "KClass<${enumName}>")
+//                builder.addType(TypeSpec.classBuilder(name = ClassName(packageName = "kotlin.reflect", simpleName = "KClass", simpleNames = enumName)
+                        .addAliasedImport(ClassName(packageName = "kotlin.reflect", simpleName = "KClass"), `as` = "KClass")
+                        .addFunction(FunSpec.builder("KClass<${enumName}>.fromAvroSpecificRecord")
                                 .addParameter(fromAvroSpecificRecordParameterName, javaType(schema))
                                 .addStatement("return ${kotlinName(schema)}.valueOf(${fromAvroSpecificRecordParameterName}.name)")
                                 .build()
                         )
-                        .build())
+                        //.build())
 
             }
         }
