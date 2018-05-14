@@ -1,7 +1,7 @@
 package main
 
 import demo.*
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+import io.confluent.kafka.streams.serdes.avro.MySpecificAvroSerde
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
     config[AUTO_OFFSET_RESET_CONFIG] = "earliest"
     config["schema.registry.url"] = "http://localhost:8081"
     config[DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.String().javaClass
-    config[DEFAULT_VALUE_SERDE_CLASS_CONFIG] = SpecificAvroSerde::class.java
+    config[DEFAULT_VALUE_SERDE_CLASS_CONFIG] = KotlinAvroSerde::class.java
     config[CACHE_MAX_BYTES_BUFFERING_CONFIG] = "0"
 
     val builder = StreamsBuilder()
