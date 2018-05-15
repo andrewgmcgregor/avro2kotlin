@@ -1,8 +1,9 @@
 package main
 
 import demo.ExamplePerson
-import demo.ExamplePersonKt
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroDeserializer
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerializer
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Deserializer
@@ -22,11 +23,6 @@ interface KotlinAvroConverter<K, A : SpecificRecord> {
 //    }
 //}
 
-class ExamplePersonKotlinAvroConverter : KotlinAvroConverter<ExamplePersonKt, ExamplePerson> {
-    override fun toAvroSpecificRecord(examplePersonKt: ExamplePersonKt) = ExamplePerson(examplePersonKt.id, examplePersonKt.username)
-    override fun fromAvroSpecificRecord(examplePerson: ExamplePerson) = ExamplePersonKt(id = examplePerson.id, username = if (examplePerson.username == null) null else examplePerson.username)
-}
-
 object KotlinAvroConverterCache {
     val converters: MutableMap<String, KotlinAvroConverter<Any, SpecificRecord>> = mutableMapOf()
 
@@ -35,7 +31,8 @@ object KotlinAvroConverterCache {
             return converters.getValue(fullyQualifiedSchemaName)
         }
 
-        val converterClass = Class.forName("${fullyQualifiedSchemaName}KotlinAvroConverter")
+        val converterClassName = "${fullyQualifiedSchemaName}KotlinAvroConverter"
+        val converterClass = Class.forName(converterClassName)
         val converter = converterClass.getConstructor().newInstance() as KotlinAvroConverter<Any, SpecificRecord>
         converters.put(fullyQualifiedSchemaName, converter)
 
@@ -44,22 +41,46 @@ object KotlinAvroConverterCache {
 }
 
 class KotlinAvroDeserializer<T> : Deserializer<T> {
-    val specificAvroDeserializer = SpecificAvroDeserializer<SpecificRecord>()
+    var schemaRegistryClient: CachedSchemaRegistryClient? = null
+    var inner: KafkaAvroDeserializer? = null
+
+//    val specificAvroDeserializer = SpecificAvroDeserializer<SpecificRecord>()
 
     override fun configure(configs: MutableMap<String, *>?, isKey: Boolean) {
-        specificAvroDeserializer.configure(configs, isKey)
+        val mutableConfigs = configs as MutableMap<String, Any>
+        mutableConfigs.put("specific.avro.reader", true)
+
+        val config = KafkaAvroDeserializerConfig(configs)
+
+        val urls = config.getSchemaRegistryUrls()
+        val maxSchemaObject = config.getMaxSchemasPerSubject()
+        this.schemaRegistryClient = CachedSchemaRegistryClient(urls, maxSchemaObject);
+        this.inner = KafkaAvroDeserializer(schemaRegistryClient, configs)
     }
 
-    override fun deserialize(topic: String?, data: ByteArray?): T {
-//        specificAvroDeserializer.
+//    fun withSpecificAvroEnabled(config: Map<String, *>?): Map<String, Any> {
+//        val specificAvroEnabledConfig = if (config == null) mutableMapOf<String, Any>() else mutableMapOf<String, Any>(config)
+//        specificAvroEnabledConfig["specific.avro.reader"] = true
+//        return specificAvroEnabledConfig
+//    }
 
-        val specificRecord: SpecificRecord = specificAvroDeserializer.deserialize(topic, data)
-        val converter = KotlinAvroConverterCache.converterFor(topic!!)
+
+    override fun deserialize(topic: String?, data: ByteArray?): T {
+//        val specificRecord: SpecificRecord = specificAvroDeserializer.deserialize(topic, data)
+        val specificRecord = this.inner?.deserialize(topic, data) as SpecificRecord
+
+
+//        val allSubjects = this.schemaRegistryClient?.allSubjects
+//        println("schemaRegistryClient = ${schemaRegistryClient}")
+
+//        val converter = KotlinAvroConverterCache.converterFor(topic!!)
+        val converter = KotlinAvroConverterCache.converterFor(specificRecord.schema.fullName)
         return converter.fromAvroSpecificRecord(specificRecord) as T
     }
 
     override fun close() {
-        specificAvroDeserializer.close()
+//        specificAvroDeserializer.close()
+        this.inner?.close()
     }
 }
 
@@ -71,7 +92,8 @@ class KotlinAvroSerializer<T> : Serializer<T> {
     }
 
     override fun serialize(topic: String?, data: T): ByteArray {
-        val converter = KotlinAvroConverterCache.converterFor(topic!!)
+        val classname = (data as Any).javaClass.name.replace(regex = Regex("Kt$"), replacement = "")
+        val converter = KotlinAvroConverterCache.converterFor(classname)
         val specificRecord = converter.toAvroSpecificRecord(data as Any)
         return specificAvroSerializer.serialize(topic, specificRecord)
     }

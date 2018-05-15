@@ -1,7 +1,6 @@
 package main
 
 import demo.*
-import io.confluent.kafka.streams.serdes.avro.MySpecificAvroSerde
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -23,11 +22,9 @@ fun main(args: Array<String>) {
 
     val builder = StreamsBuilder()
 
-    builder.stream<String, ExamplePerson>(EXAMPLE_PERSON_PRODUCER_OUTPUT_TOPIC)
-            .mapValues { value -> ExamplePersonKt.fromAvroSpecificRecord(value) }
+    builder.stream<String, ExamplePersonKt>(EXAMPLE_PERSON_PRODUCER_OUTPUT_TOPIC)
             .peek { key, value -> println("${key} = ${value}") }
             .mapValues { it.copy(username = it.username + "asfasfasd") }
-            .mapValues { it.toAvroSpecificRecord() }
             .to(EXAMPLE_PERSON_KSTREAM_OUTPUT_TOPIC)
 
     val kafkaStreams = KafkaStreams(builder.build(), config)

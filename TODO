@@ -1,5 +1,7 @@
+before commit: use higher level serialiser again inside my kotlinavroserialiser
 add converters to generated kotlin enum
-serde, hiding the java type
+serde, so you don't need to even know the java type exists
+stop looking up the kotlin class at runtime in the serialiser
 
 support arrays
 support maps
