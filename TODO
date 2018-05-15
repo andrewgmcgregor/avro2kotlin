@@ -1,3 +1,4 @@
+replace schema interpreting code with my skinny spec generator
 before commit: use higher level serialiser again inside my kotlinavroserialiser
 add converters to generated kotlin enum
 serde, so you don't need to even know the java type exists

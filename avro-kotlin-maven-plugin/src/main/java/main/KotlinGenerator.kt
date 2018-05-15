@@ -196,9 +196,5 @@ object KotlinGenerator {
                 }
     }
 
-    private data class MinimalTypeSpec(val kotlinType: TypeName,
-                                       val avroType: Boolean)
 
-    private data class MinimalFieldSpec(val name: String,
-                                        val minimalTypeSpec: MinimalTypeSpec)
 }
