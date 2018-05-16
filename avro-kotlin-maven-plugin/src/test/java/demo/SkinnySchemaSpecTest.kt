@@ -1,6 +1,7 @@
 package demo
 
 import main.SkinnySchemaSpecBuilder
+import org.apache.avro.Schema
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -22,6 +23,7 @@ class SkinnySchemaSpecTest {
         val skinnySchemaSpec1 = avroInterfaceSpec.schemaSpecs.get(0)
         assertThat(skinnySchemaSpec1.namespace, `is`("com.example"))
         assertThat(skinnySchemaSpec1.name, `is`("ExampleRecord1"))
+        assertThat(skinnySchemaSpec1.type, `is`(Schema.Type.RECORD))
 
         val skinnySchemaSpec2 = avroInterfaceSpec.schemaSpecs.get(1)
         assertThat(skinnySchemaSpec2.namespace, `is`("com.example"))
