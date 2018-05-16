@@ -5,9 +5,9 @@ import org.apache.avro.Schema
 
 
 object DataClassGenerator {
-    fun generateFrom(spec: SkinnyAvroFileSpec): FileSpec {
-        val builder = FileSpec.builder(spec.namespace, spec.name)
-        spec.schemaSpecs.forEach { schemaSpec ->
+    fun generateFrom(avroSpec: SkinnyAvroFileSpec): FileMaker {
+        val builder = FileSpec.builder(avroSpec.namespace, avroSpec.name)
+        avroSpec.schemaSpecs.forEach { schemaSpec ->
             if (schemaSpec.type == Schema.Type.RECORD) {
                 val fileName = "${schemaSpec.name}Kt"
                 builder.addType(TypeSpec.classBuilder(fileName)
@@ -17,7 +17,9 @@ object DataClassGenerator {
                         .build())
             }
         }
-        return builder.build()
+
+        val fileSpec = builder.build()
+        return AvroSpecFileMakerFactory.newInstance(avroSpec, fileSpec)
     }
 
     private fun buildPrimaryConstructor(schemaSpec: SkinnySchemaSpec): FunSpec {

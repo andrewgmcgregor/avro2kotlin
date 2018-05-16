@@ -7,9 +7,13 @@ interface KotlinAvroConverter<K, A> {
 }
 
 object DataClassConverterGenerator {
-    fun generateFrom(spec: SkinnyAvroFileSpec): FileSpec {
-        val builder = FileSpec.builder(spec.namespace, spec.name)
-        spec.schemaSpecs.forEach { schemaSpec ->
+    fun generateFrom(avroSpec: SkinnyAvroFileSpec): FileMaker {
+        val converterAvroSpec = avroSpec.copy(
+                namespace = "${avroSpec.namespace}.converter",
+                name = "${avroSpec.name}Converter")
+
+        val builder = FileSpec.builder(converterAvroSpec.namespace, converterAvroSpec.name)
+        converterAvroSpec.schemaSpecs.forEach { schemaSpec ->
             if (schemaSpec.type == Schema.Type.RECORD) {
                 val fileName = "${schemaSpec.name}Converter"
                 val superclass: ParameterizedTypeName = ParameterizedTypeName.get(
@@ -26,7 +30,10 @@ object DataClassConverterGenerator {
                         .build())
             }
         }
-        return builder.build()
+
+        val fileSpec = builder.build()
+        return AvroSpecFileMakerFactory.newInstance(
+                converterAvroSpec, fileSpec)
     }
 
     private fun buildConverterToAvro(schemaSpec: SkinnySchemaSpec): FunSpec {
