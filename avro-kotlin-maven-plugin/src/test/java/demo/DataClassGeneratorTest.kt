@@ -8,7 +8,7 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-class KotlinGeneratorTest {
+class DataClassGeneratorTest {
 
     @Test
     fun shouldOutputRecord() {
@@ -16,7 +16,7 @@ class KotlinGeneratorTest {
                 namespace = "com.example",
                 name = "ExampleInterface",
                 schemaSpecs = listOf(SkinnySchemaSpec(
-                        namespace = "<IGNORED>",
+                        namespace = "com.example",
                         name = "ExampleRecord",
                         type = Schema.Type.RECORD,
                         fields = listOf(MinimalFieldSpec(
@@ -31,7 +31,7 @@ class KotlinGeneratorTest {
         val fileSpec = DataClassGenerator.generateFrom(spec)
         val generatedCode = extractContent(fileSpec)
 
-        assertThat(generatedCode, containsString("data class ExampleRecordKt"))
+        assertThat(generatedCode, containsString("class ExampleRecord"))
         assertThat(generatedCode, containsString("val exampleString: String"))
 
         println("generatedCode = ${generatedCode}")
