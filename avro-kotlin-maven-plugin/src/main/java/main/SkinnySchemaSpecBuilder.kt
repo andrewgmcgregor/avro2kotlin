@@ -105,16 +105,6 @@ object SkinnySchemaSpecBuilder {
         return typeName?.asTypeName()
     }
 
-    fun javaName(schema: Schema) = schema.name
-    fun kotlinName(schema: Schema) = "${javaName(schema)}Kt"
-    fun javaType(schema: Schema): TypeName {
-        val className = ClassName(schema.namespace, schema.name)
-        return className
-    }
-    fun kotlinType(schema: Schema): TypeName {
-        val kotlinName = "${schema.name}Kt"
-        val className = ClassName(schema.namespace, kotlinName)
-        return className
-    }
-
+    fun kotlinType(schema: Schema)
+        = ClassName(schema.namespace, "${schema.name}Kt")
 }
