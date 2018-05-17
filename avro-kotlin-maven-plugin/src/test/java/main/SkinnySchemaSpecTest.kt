@@ -1,6 +1,5 @@
-package demo
+package main
 
-import main.SkinnySchemaSpecBuilder
 import org.apache.avro.Schema
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat

@@ -1,6 +1,5 @@
-package demo
+package main
 
-import main.FileMaker
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test

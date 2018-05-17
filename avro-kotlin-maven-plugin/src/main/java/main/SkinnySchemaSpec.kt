@@ -3,7 +3,8 @@ package main
 import com.squareup.kotlinpoet.TypeName
 import org.apache.avro.Schema
 
-data class SkinnyAvroFileSpec(val namespace: String,
+data class
+SkinnyAvroFileSpec(val namespace: String,
                               val name: String,
                               val schemaSpecs: List<SkinnySchemaSpec>)
 

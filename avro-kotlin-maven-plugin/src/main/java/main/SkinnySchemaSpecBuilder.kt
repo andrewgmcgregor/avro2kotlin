@@ -5,9 +5,32 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import org.apache.avro.Schema
 import org.apache.avro.compiler.idl.Idl
+import java.io.File
 import java.io.InputStream
+import main.SkinnyAvroFileSpec
+import main.MinimalFieldSpec
+import main.MinimalTypeSpec
+import main.SkinnySchemaSpec
 
 object SkinnySchemaSpecBuilder {
+    fun generateFromFile(schemaFilename: String): main.SkinnyAvroFileSpec {
+        val file = File(schemaFilename)
+        val inputStream = file.inputStream()
+        inputStream.use {
+            when {
+//                schemaFilename.endsWith(".avsc") -> return generateFromAvsc(inputStream)
+                schemaFilename.endsWith(".avdl") -> return generateFromAvdl(inputStream)
+                else -> throw IllegalArgumentException("expected file ending in .avsc or .avdl")
+            }
+        }
+    }
+
+//    fun generateFromAvsc(inputStream: InputStream): FileSpec {
+//        val schema = Schema.Parser().parse(inputStream)
+//        val fileSpec = KotlinGenerator.generateFromSchemas(listOf(schema), schema.namespace, schema.name)
+//        return fileSpec
+//    }
+
     fun generateFromAvdl(inputStream: InputStream): SkinnyAvroFileSpec {
         val compilationUnit = Idl(inputStream).CompilationUnit()
 

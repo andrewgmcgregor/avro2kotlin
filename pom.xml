@@ -31,6 +31,8 @@
         <plugin-plugin.version>3.4</plugin-plugin.version>
         <file-management.version>1.2.1</file-management.version>
         <avro.version>1.8.2</avro.version>
+        <build.plugins.plugin.version>3.4
+        </build.plugins.plugin.version>
     </properties>
 
     <dependencyManagement>

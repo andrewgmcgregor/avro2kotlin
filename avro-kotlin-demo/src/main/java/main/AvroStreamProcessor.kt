@@ -13,6 +13,7 @@ import java.util.*
 val KSTREAM_OUTPUT_TOPIC = "exampleNestingsFromKStream"
 
 fun main(args: Array<String>) {
+
     val config = Properties()
     config[APPLICATION_ID_CONFIG] = "avro-stream-processor-" + System.currentTimeMillis()
     config[BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"

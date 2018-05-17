@@ -1,13 +1,12 @@
 package org.apache.avro.mojo;
 
-import com.squareup.kotlinpoet.FileSpec;
-import main.KotlinGenerator;
-import main.Utils;
-import org.jetbrains.annotations.NotNull;
+import main.DataClassConverterGenerator;
+import main.DataClassGenerator;
+import main.SkinnyAvroFileSpec;
+import main.SkinnySchemaSpecBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * Generate Kotlin classes and interfaces
@@ -38,27 +37,16 @@ public class KotlinGeneratorMojo extends AbstractAvroMojo {
 
     @Override
     protected void doCompile(String filename, File sourceDirectory, File outputDirectory) throws IOException {
-        File inputFile = getInputFile(filename, sourceDirectory);
-        FileSpec fileSpec = KotlinGenerator.INSTANCE.generateFromFile(inputFile.getAbsolutePath());
+        String inputFile = sourceDirectory.getAbsolutePath() + "/" + filename;
+        SkinnyAvroFileSpec skinnyAvroFileSpec = SkinnySchemaSpecBuilder.INSTANCE.generateFromFile(inputFile);
 
-        String outputFilename = fileSpec.getName();
-        String outputDirectoryWithPackage = outputDirectory.getAbsolutePath() + "/" + fileSpec.getPackageName().replace('.', '/');
-        PrintStream outputStream = Utils.tryOrThrow(() -> getOutputStream(
-                outputFilename + ".kt",
-                new File(outputDirectoryWithPackage)));
-        fileSpec.writeTo(outputStream);
-    }
+        DataClassGenerator.INSTANCE
+                .generateFrom(skinnyAvroFileSpec)
+                .writeFileRelativeTo(outputDirectory);
 
-    @NotNull
-    private static File getInputFile(String filename, File inputDirectory) {
-        inputDirectory.mkdirs();
-        return new File(inputDirectory.getAbsolutePath() + "/" + filename);
-    }
-
-    @NotNull
-    private static PrintStream getOutputStream(String filename, File outputDirectory) throws Exception {
-        outputDirectory.mkdirs();
-        return new PrintStream(new File(outputDirectory.getAbsolutePath() + "/" + filename));
+        DataClassConverterGenerator.INSTANCE
+                .generateFrom(skinnyAvroFileSpec)
+                .writeFileRelativeTo(outputDirectory);
     }
 
     @Override
