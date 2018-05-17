@@ -18,18 +18,33 @@ object SkinnySchemaSpecBuilder {
         val inputStream = file.inputStream()
         inputStream.use {
             when {
-//                schemaFilename.endsWith(".avsc") -> return generateFromAvsc(inputStream)
+                schemaFilename.endsWith(".avsc") -> return generateFromAvsc(inputStream)
                 schemaFilename.endsWith(".avdl") -> return generateFromAvdl(inputStream)
                 else -> throw IllegalArgumentException("expected file ending in .avsc or .avdl")
             }
         }
     }
 
-//    fun generateFromAvsc(inputStream: InputStream): FileSpec {
-//        val schema = Schema.Parser().parse(inputStream)
-//        val fileSpec = KotlinGenerator.generateFromSchemas(listOf(schema), schema.namespace, schema.name)
-//        return fileSpec
-//    }
+    fun generateFromAvsc(inputStream: InputStream): SkinnyAvroFileSpec {
+        val schema = Schema.Parser().parse(inputStream)
+        SkinnySchemaSpec(
+                namespace = schema.namespace,
+                name = schema.name,
+                type = schema.type,
+                fields = schemaToFieldNamesAndTypes(schema)
+        )
+
+        return SkinnyAvroFileSpec(
+                namespace = schema.namespace,
+                name = schema.name,
+                schemaSpecs = listOf(SkinnySchemaSpec(
+                        namespace = schema.namespace,
+                        name = schema.name,
+                        type = schema.type,
+                        fields = schemaToFieldNamesAndTypes(schema)
+                ))
+        )
+    }
 
     fun generateFromAvdl(inputStream: InputStream): SkinnyAvroFileSpec {
         val compilationUnit = Idl(inputStream).CompilationUnit()
@@ -45,9 +60,9 @@ object SkinnySchemaSpecBuilder {
         }
 
         return SkinnyAvroFileSpec(
-            namespace = compilationUnit.namespace,
-            name = compilationUnit.name,
-            schemaSpecs = schemaSpecs
+                namespace = compilationUnit.namespace,
+                name = compilationUnit.name,
+                schemaSpecs = schemaSpecs
         )
     }
 
@@ -113,6 +128,7 @@ object SkinnySchemaSpecBuilder {
 
         throw IllegalArgumentException(schema.type.getName());
     }
+
     private fun isSimpleKotlinType(type: Schema.Type): Boolean = toSimpleKotlinType(type) != null
 
     private fun toSimpleKotlinType(type: Schema.Type): TypeName? {
@@ -128,6 +144,5 @@ object SkinnySchemaSpecBuilder {
         return typeName?.asTypeName()
     }
 
-    fun kotlinType(schema: Schema)
-        = ClassName(schema.namespace, "${schema.name}Kt")
+    fun kotlinType(schema: Schema) = ClassName(schema.namespace, "${schema.name}Kt")
 }
