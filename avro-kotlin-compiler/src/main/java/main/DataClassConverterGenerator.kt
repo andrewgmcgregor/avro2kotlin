@@ -42,7 +42,8 @@ object DataClassConverterGenerator {
                 .map { "${parameterName}.${it.name}" + if (it.minimalTypeSpec.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
-                .addParameter(name = parameterName, type = ClassName(schemaSpec.namespace, schemaSpec.name))
+                .addModifiers(listOf(KModifier.OVERRIDE))
+                .addParameter(name = parameterName, type = ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))
                 .addStatement("return ${schemaSpec.namespace}.${schemaSpec.name}${argList}")
                 .build()
         return buildConverterToAvro
@@ -61,9 +62,10 @@ object DataClassConverterGenerator {
                 }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val fromAvroSpecificRecordBuilder = FunSpec.builder("fromAvroSpecificRecord")
+                .addModifiers(listOf(KModifier.OVERRIDE))
                 .addParameter(
                         name = fromAvroSpecificRecordParameterName,
-                        type = ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))
+                        type = ClassName(schemaSpec.namespace, schemaSpec.name))
                 .addStatement("return ${schemaSpec.name}Kt${kotlinConstructorFieldList}")
         val fromAvroSpecificRecordFunction = fromAvroSpecificRecordBuilder.build()
         return fromAvroSpecificRecordFunction
