@@ -3,6 +3,7 @@ package main
 import demo.Example
 import demo.ExampleKt
 import demo.ExampleNestingKt
+import demo.converter.ExampleConverter
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
@@ -36,7 +37,7 @@ object AvroBasedExampleProducer {
                 val record = ProducerRecord(
                         outputTopic,
                         "" + index,
-                        exampleKt.toAvroSpecificRecord())
+                        ExampleConverter.toAvroSpecificRecord(exampleKt))
 
                 val metadata = producer.send(record).get()
 

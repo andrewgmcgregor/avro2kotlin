@@ -1,6 +1,7 @@
 package main
 
 import demo.*
+import demo.converter.ExamplePersonConverter
 import io.confluent.kafka.serializers.KafkaAvroSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
@@ -32,7 +33,7 @@ object ExamplePersonAvroBasedProducer {
                 val record = ProducerRecord(
                         outputTopic,
                         "" + index,
-                        examplePersonKt.toAvroSpecificRecord())
+                        ExamplePersonConverter.toAvroSpecificRecord(examplePersonKt))
 
                 val metadata = producer.send(record).get()
 

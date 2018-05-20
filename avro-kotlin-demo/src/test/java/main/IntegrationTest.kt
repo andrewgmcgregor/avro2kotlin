@@ -1,6 +1,8 @@
 package main
 
 import demo.*
+import demo.converter.ExampleConverter
+import demo.converter.ExamplePersonConverter
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -29,14 +31,14 @@ class IntegrationTest {
     }
 
     private fun convertExamplePersonThereAndBackAgain(examplePerson: ExamplePerson): ExamplePerson {
-        val kotlinExamplePerson = demo.ExamplePersonKt.fromAvroSpecificRecord(examplePerson)
-        val reconstitutedExamplePerson = kotlinExamplePerson.toAvroSpecificRecord()
+        val kotlinExamplePerson = ExamplePersonConverter.fromAvroSpecificRecord(examplePerson)
+        val reconstitutedExamplePerson = ExamplePersonConverter.toAvroSpecificRecord(kotlinExamplePerson)
         return reconstitutedExamplePerson
     }
 
     private fun convertExampleThereAndBackAgain(example: Example): Example {
-        val kotlinObject = demo.ExampleKt.fromAvroSpecificRecord(example)
-        val javaObject = kotlinObject.toAvroSpecificRecord()
+        val kotlinObject = ExampleConverter.fromAvroSpecificRecord(example)
+        val javaObject = ExampleConverter.toAvroSpecificRecord(kotlinObject)
         return javaObject
     }
 }
