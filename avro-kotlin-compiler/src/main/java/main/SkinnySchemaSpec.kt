@@ -15,5 +15,7 @@ data class SkinnySchemaSpec(val namespace: String,
 data class MinimalFieldSpec(val name: String,
                             val minimalTypeSpec: MinimalTypeSpec)
 
-data class MinimalTypeSpec(val kotlinType: TypeName,
+data class MinimalTypeSpec(val namespace: String,
+                           val name: String,
+                           val kotlinType: TypeName,
                            val avroType: Boolean)

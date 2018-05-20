@@ -3,6 +3,7 @@ before commit: use higher level serialiser again inside my kotlinavroserialiser
 add converters to generated kotlin enum
 serde, so you don't need to even know the java type exists
 stop looking up the kotlin class at runtime in the serialiser
+replace avro: boolean with a comparison to known primitive supported types.
 
 support arrays
 support maps

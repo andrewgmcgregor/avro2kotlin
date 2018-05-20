@@ -70,8 +70,11 @@ object KotlinGenerator {
 
     private fun toKotlinType(schema: Schema): MinimalTypeSpec {
         if (isSimpleKotlinType(schema.type)) {
+            val kotlinType = toSimpleKotlinType(schema.type)!! as ClassName
             return MinimalTypeSpec(
-                    kotlinType = toSimpleKotlinType(schema.type)!!,
+                    namespace = kotlinType.packageName(),
+                    name = kotlinType.simpleName(),
+                    kotlinType = kotlinType,
                     avroType = false)
         }
 
@@ -90,9 +93,12 @@ object KotlinGenerator {
             }
 
             var type = typesOtherThanNull.get(0)
-            if (isSimpleKotlinType(type)) {
+            if (isSimpleKotlinType(schema.type)) {
+                val kotlinType = toSimpleKotlinType(schema.type)!! as ClassName
                 return MinimalTypeSpec(
-                        kotlinType = toSimpleKotlinType(type)!!.asNullable(),
+                        namespace = kotlinType.packageName(),
+                        name = kotlinType.simpleName(),
+                        kotlinType = kotlinType,
                         avroType = false)
             }
 
@@ -106,6 +112,8 @@ object KotlinGenerator {
 
         if (schema.type == Schema.Type.RECORD) {
             return MinimalTypeSpec(
+                    namespace = schema.namespace,
+                    name = schema.name,
                     kotlinType = kotlinType(schema),
                     avroType = true)
         }
@@ -113,6 +121,8 @@ object KotlinGenerator {
         if (schema.type == Schema.Type.ENUM) {
             val kotlinType = kotlinType(schema)
             return MinimalTypeSpec(
+                    namespace = schema.namespace,
+                    name = schema.name,
                     kotlinType = kotlinType,
                     avroType = true
             )
