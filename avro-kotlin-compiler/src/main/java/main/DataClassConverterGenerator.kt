@@ -59,9 +59,19 @@ object DataClassConverterGenerator {
     }
 
     private fun buildConverterToAvro(schemaSpec: SkinnySchemaSpec): FunSpec {
+        val toAvroSpecificRecordParameterName = schemaSpec.name.decapitalize()
         val parameterName = schemaSpec.name.decapitalize()
         var argList = schemaSpec.fields
-                .map { "${parameterName}.${it.name}" + if (it.minimalTypeSpec.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
+//                .map { "${parameterName}.${it.name}" + if (it.minimalTypeSpec.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
+                .map { minimalFieldSpec ->
+                    val converterName = "${minimalFieldSpec.minimalTypeSpec.namespace}.converter.${minimalFieldSpec.minimalTypeSpec.name}Converter"
+                    var param = "${toAvroSpecificRecordParameterName}.${minimalFieldSpec.name}"
+                    "" +
+                            "${if (minimalFieldSpec.minimalTypeSpec.kotlinType.nullable) "if (${param} == null) null else " else ""}" +
+                            "${if (minimalFieldSpec.minimalTypeSpec.avroType) "${converterName}.toAvroSpecificRecord(" else ""}" +
+                            param +
+                            "${if (minimalFieldSpec.minimalTypeSpec.avroType) ")" else ""}"
+                }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
                 .addParameter(name = parameterName, type = ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))

@@ -64,8 +64,8 @@ class DataClassGeneratorTest {
 
         val generatedCode = fileMaker.content
         assertThat(generatedCode, containsString("class ExampleRecordConverter : KotlinAvroConverter<ExampleRecordKt, ExampleRecord>"))
+        assertThat(generatedCode, containsString("com.example.converter.ExampleNestingConverter.toAvroSpecificRecord(exampleRecord.exampleNesting)"))
         assertThat(generatedCode, containsString("fun toAvroSpecificRecord(exampleRecord: ExampleRecordKt)"))
         assertThat(generatedCode, containsString("fun fromAvroSpecificRecord(exampleRecord: ExampleRecord)"))
     }
-
 }
