@@ -41,20 +41,22 @@ object DataClassConverterGenerator {
     }
 
     private fun buildConverterToAvroOverride(schemaSpec: SkinnySchemaSpec): FunSpec {
+        val name = schemaSpec.name.decapitalize()
         return FunSpec.builder("toAvroSpecificRecord")
                 .addModifiers(listOf(KModifier.OVERRIDE))
-                .addParameter(name = schemaSpec.name.decapitalize(), type = ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))
+                .addParameter(name = name, type = ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))
                 .returns(ClassName(schemaSpec.namespace, "${schemaSpec.name}"))
-                .addStatement("TODO()")
+                .addStatement("return ${schemaSpec.name}Converter.toAvroSpecificRecord(${name})")
                 .build()
     }
 
     private fun buildConverterFromAvroOverride(schemaSpec: SkinnySchemaSpec): FunSpec {
+        val name = schemaSpec.name.decapitalize()
         return FunSpec.builder("fromAvroSpecificRecord")
                 .addModifiers(listOf(KModifier.OVERRIDE))
-                .addParameter(name = schemaSpec.name.decapitalize(), type = ClassName(schemaSpec.namespace, "${schemaSpec.name}"))
+                .addParameter(name = name, type = ClassName(schemaSpec.namespace, "${schemaSpec.name}"))
                 .returns(ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))
-                .addStatement("TODO()")
+                .addStatement("return ${schemaSpec.name}Converter.fromAvroSpecificRecord(${name})")
                 .build()
     }
 
@@ -62,7 +64,6 @@ object DataClassConverterGenerator {
         val toAvroSpecificRecordParameterName = schemaSpec.name.decapitalize()
         val parameterName = schemaSpec.name.decapitalize()
         var argList = schemaSpec.fields
-//                .map { "${parameterName}.${it.name}" + if (it.minimalTypeSpec.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
                 .map { minimalFieldSpec ->
                     val converterName = "${minimalFieldSpec.minimalTypeSpec.namespace}.converter.${minimalFieldSpec.minimalTypeSpec.name}Converter"
                     var param = "${toAvroSpecificRecordParameterName}.${minimalFieldSpec.name}"
