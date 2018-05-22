@@ -27,11 +27,9 @@ fun main(args: Array<String>) {
 
     val builder = StreamsBuilder()
 
-    builder.stream<String, Example>(PRODUCER_OUTPUT_TOPIC)
-            .mapValues { value -> ExampleConverter.fromAvroSpecificRecord(value) }
+    builder.stream<String, ExampleKt>(PRODUCER_OUTPUT_TOPIC)
             .peek { key, value -> println("${key} = ${value}") }
-            .mapValues { it.exampleNesting }
-            .mapValues { ExampleNestingConverter.toAvroSpecificRecord(it) }
+            .mapValues { "this is the output <<${it.exampleNesting}>>" }
             .to(KSTREAM_OUTPUT_TOPIC)
 
     val kafkaStreams = KafkaStreams(builder.build(), config)

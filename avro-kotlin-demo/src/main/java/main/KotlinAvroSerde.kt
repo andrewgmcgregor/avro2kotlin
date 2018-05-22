@@ -1,6 +1,5 @@
 package main
 
-import demo.ExamplePerson
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig
@@ -31,8 +30,12 @@ object KotlinAvroConverterCache {
             return converters.getValue(fullyQualifiedSchemaName)
         }
 
-        val converterClassName = "${fullyQualifiedSchemaName}KotlinAvroConverter"
-        val converterClass = Class.forName(converterClassName)
+        val parts = fullyQualifiedSchemaName.split(".").asReversed()
+        val partialList = parts.drop(1)
+        val converterName = listOf("${parts[0]}Converter", "converter", *partialList.toTypedArray())
+                .asReversed()
+                .joinToString(separator = ".")
+        val converterClass = Class.forName(converterName)
         val converter = converterClass.getConstructor().newInstance() as KotlinAvroConverter<Any, SpecificRecord>
         converters.put(fullyQualifiedSchemaName, converter)
 
@@ -74,7 +77,9 @@ class KotlinAvroDeserializer<T> : Deserializer<T> {
 //        println("schemaRegistryClient = ${schemaRegistryClient}")
 
 //        val converter = KotlinAvroConverterCache.converterFor(topic!!)
-        val converter = KotlinAvroConverterCache.converterFor(specificRecord.schema.fullName)
+//        val fullyQualifiedConverterName = "${specificRecord.schema.namespace}.converter.${specificRecord.schema.name}Converter"
+        val fullyQualifiedSchemaName = "${specificRecord.schema.fullName}"
+        val converter = KotlinAvroConverterCache.converterFor(fullyQualifiedSchemaName)
         return converter.fromAvroSpecificRecord(specificRecord) as T
     }
 
