@@ -1,10 +1,7 @@
 package main
 
-import demo.Example
 import demo.ExampleKt
-import demo.converter.ExampleConverter
-import demo.converter.ExampleNestingConverter
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+import demo.ExampleStringRecordKt
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -29,7 +26,7 @@ fun main(args: Array<String>) {
 
     builder.stream<String, ExampleKt>(PRODUCER_OUTPUT_TOPIC)
             .peek { key, value -> println("${key} = ${value}") }
-            .mapValues { "this is the output <<${it.exampleNesting}>>" }
+            .mapValues { ExampleStringRecordKt("this is the output <<${it.exampleNesting}>>") }
             .to(KSTREAM_OUTPUT_TOPIC)
 
     val kafkaStreams = KafkaStreams(builder.build(), config)

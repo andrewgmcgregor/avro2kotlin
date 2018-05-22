@@ -29,4 +29,11 @@ protocol ExampleInterface {
 
     union { null, string } guid = null;
   }
+
+  record ExampleStringRecord {
+
+    string message;
+
+  }
+
 }

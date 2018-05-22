@@ -1,9 +1,5 @@
-replace schema interpreting code with my skinny spec generator
-before commit: use higher level serialiser again inside my kotlinavroserialiser
-add converters to generated kotlin enum
-serde, so you don't need to even know the java type exists
 stop looking up the kotlin class at runtime in the serialiser
-replace avro: boolean with a comparison to known primitive supported types.
+replace avro type: boolean with a comparison to known primitive supported types.
 
 support arrays
 support maps
@@ -15,6 +11,8 @@ remove the avro-maven-plugin source from my codebase - use it as a dependency in
 make the output classes easy to read and understand: hide converter methods in a factory
 
 get the integration tests to run without a real kafka broker
+
+what does kafka avro serde do when you write a raw string to a topic? because currently we only support actual avro types
 
 
 =-====
