@@ -1,6 +1,4 @@
-stop looking up the kotlin class at runtime in the serialiser
-replace avro type: boolean with a comparison to known primitive supported types.
-
+support enums
 support arrays
 support maps
 support other innerTypes
@@ -12,42 +10,5 @@ make the output classes easy to read and understand: hide converter methods in a
 
 get the integration tests to run without a real kafka broker
 
-what does kafka avro serde do when you write a raw string to a topic? because currently we only support actual avro types
-
-
-=-====
-package demo.converter
-
-import demo.Example
-import demo.ExampleKt
-import demo.ExampleNesting
-import demo.ExampleNestingKt
-import main.KotlinAvroConverter
-
-class ExampleNestingConverter : KotlinAvroConverter<ExampleNestingKt, ExampleNesting> {
-    override fun toAvroSpecificRecord(exampleNesting: ExampleNestingKt) = ExampleNestingConverter.toAvroSpecificRecord(exampleNesting)
-    override fun fromAvroSpecificRecord(exampleNesting: ExampleNesting) = ExampleNestingConverter.fromAvroSpecificRecord(exampleNesting)
-    companion object {
-        fun toAvroSpecificRecord(exampleNesting: ExampleNestingKt) = demo.ExampleNesting(exampleNesting.isGood)
-        fun fromAvroSpecificRecord(exampleNesting: ExampleNesting) = ExampleNestingKt(isGood = exampleNesting.isGood)
-    }
-}
-
-class ExampleConverter : KotlinAvroConverter<ExampleKt, Example> {
-    override fun toAvroSpecificRecord(example: ExampleKt) = ExampleConverter.toAvroSpecificRecord(example)
-    override fun fromAvroSpecificRecord(example: Example) = ExampleConverter.fromAvroSpecificRecord(example)
-    companion object {
-        fun toAvroSpecificRecord(example: ExampleKt) = demo.Example(
-                example.id,
-                ExampleNestingConverter.toAvroSpecificRecord(example.exampleNesting),
-                if (example.my_nested_member == null) null else ExampleNestingConverter.toAvroSpecificRecord(example.my_nested_member!!),
-                example.guid)
-
-        fun fromAvroSpecificRecord(example: Example) = ExampleKt(
-                id = example.id,
-                exampleNesting = ExampleNestingConverter.fromAvroSpecificRecord(example.exampleNesting),
-                my_nested_member = if (example.my_nested_member == null) null else ExampleNestingConverter.fromAvroSpecificRecord(example.my_nested_member),
-                guid = if (example.guid == null) null else example.guid)
-    }
-}
-
+stop looking up the kotlin class at runtime in the serialiser
+replace avro type: boolean with a comparison to known primitive supported types.
