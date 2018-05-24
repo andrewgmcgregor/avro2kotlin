@@ -37,10 +37,9 @@ class EnumClassGeneratorTest {
         val generatedCode = DataClassConverterGenerator.generateFrom(spec).content
 
         assertThat(generatedCode, containsString("class ExampleEnumConverter : KotlinAvroConverter<ExampleEnumKt, ExampleEnum>"))
-        TODO("GET THE CONVERTER WORKING WITHOUT RELYING ON INHERITING FROM SPECIFIC RECORD")
-//        assertThat(generatedCode, containsString("override fun toAvroSpecificRecord(exampleRecord: ExampleRecordKt): ExampleRecord = ExampleRecordConverter.toAvroSpecificRecord(exampleRecord)"))
-//        assertThat(generatedCode, containsString("fun toAvroSpecificRecord(exampleRecord: ExampleRecordKt)"))
-//        assertThat(generatedCode, containsString("override fun fromAvroSpecificRecord(exampleRecord: ExampleRecord): ExampleRecordKt = ExampleRecordConverter.fromAvroSpecificRecord(exampleRecord)"))
-//        assertThat(generatedCode, containsString("fun fromAvroSpecificRecord(exampleRecord: ExampleRecord)"))
+        assertThat(generatedCode, containsString("override fun toAvroSpecificRecord(exampleEnum: ExampleEnumKt): ExampleEnum = ExampleEnumConverter.toAvroSpecificRecord(exampleEnum)"))
+        assertThat(generatedCode, containsString("fun toAvroSpecificRecord(exampleEnum: ExampleEnumKt) = com.example.ExampleEnum.valueOf(exampleEnum.name)"))
+        assertThat(generatedCode, containsString("override fun fromAvroSpecificRecord(exampleEnum: ExampleEnum): ExampleEnumKt = ExampleEnumConverter.fromAvroSpecificRecord(exampleEnum)"))
+        assertThat(generatedCode, containsString("fun fromAvroSpecificRecord(exampleEnum: ExampleEnum) = ExampleEnumKt.valueOf(exampleEnum.name)"))
     }
 }

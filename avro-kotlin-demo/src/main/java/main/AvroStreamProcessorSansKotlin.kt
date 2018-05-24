@@ -24,7 +24,6 @@ fun main(args: Array<String>) {
 
     builder.stream<String, Example>(PRODUCER_OUTPUT_TOPIC)
             .peek { key, value -> println("${key} = ${value}") }
-            .mapValues { "this is the output <<${it.exampleNesting}>>" }
             .to("avro.test.output.topic")
 
     val kafkaStreams = KafkaStreams(builder.build(), config)

@@ -1,5 +1,6 @@
 package main
 
+import demo.ExampleEnumKt
 import demo.ExampleKt
 import demo.ExampleStringRecordKt
 import org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG
@@ -24,8 +25,8 @@ fun main(args: Array<String>) {
 
     builder.stream<String, ExampleKt>(PRODUCER_OUTPUT_TOPIC)
             .peek { key, value -> println("${key} = ${value}") }
-            .mapValues { ExampleStringRecordKt("this is the output <<${it.exampleNesting}>>") }
-            .to("avro.test.output.topic.with.kotlin")
+            .mapValues { it.copy(my_enum = ExampleEnumKt.BAR) }
+            .to("avro.test.output.topic.with.kotlin.2")
 
     val kafkaStreams = KafkaStreams(builder.build(), config)
     kafkaStreams.start()

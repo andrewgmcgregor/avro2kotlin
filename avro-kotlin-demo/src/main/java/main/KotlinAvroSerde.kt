@@ -10,7 +10,7 @@ import org.apache.kafka.common.serialization.Serde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.Serializer
 
-interface KotlinAvroConverter<K, A : SpecificRecord> {
+interface KotlinAvroConverter<K, A> {
     fun toAvroSpecificRecord(k: K): A
     fun fromAvroSpecificRecord(a: A): K
 }

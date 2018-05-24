@@ -1,4 +1,5 @@
-support enums
+check nullable enums
+
 support arrays
 support maps
 support other innerTypes
@@ -12,17 +13,3 @@ get the integration tests to run without a real kafka broker
 
 stop looking up the kotlin class at runtime in the serialiser
 replace avro type: boolean with a comparison to known primitive supported types.
-
------
-
-but the avro-generated ExampleEnum class does not inherit from SpecificRecord!
-class ExampleEnumConverter : KotlinAvroConverter<ExampleEnumKt, ExampleEnum> {
-    override fun toAvroSpecificRecord(exampleEnum: ExampleEnumKt): ExampleEnum = ExampleEnumConverter.toAvroSpecificRecord(exampleEnum)
-
-    override fun fromAvroSpecificRecord(exampleEnum: ExampleEnum): ExampleEnumKt = ExampleEnumConverter.fromAvroSpecificRecord(exampleEnum)
-    companion object {
-        fun toAvroSpecificRecord(exampleEnum: ExampleEnumKt) = demo.ExampleEnum.valueOf(exampleEnum.name)
-
-        fun fromAvroSpecificRecord(exampleEnum: ExampleEnum) = ExampleEnumKt.valueOf(exampleEnum.name)
-    }
-}

@@ -1,6 +1,7 @@
 package main
 
 import demo.Example
+import demo.ExampleEnumKt
 import demo.ExampleKt
 import demo.ExampleNestingKt
 import demo.converter.ExampleConverter
@@ -32,6 +33,7 @@ object AvroBasedExampleProducer {
                 var exampleKt = ExampleKt(
                         id = index.toLong(),
                         exampleNesting = ExampleNestingKt(index == 0),
+                        my_enum = ExampleEnumKt.FOO,
                         my_nested_member = if (index == 0) null else ExampleNestingKt(true),
                         guid = "name-$favoriteColour")
                 val record = ProducerRecord(

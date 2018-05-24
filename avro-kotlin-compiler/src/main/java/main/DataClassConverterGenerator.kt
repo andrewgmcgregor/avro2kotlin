@@ -3,8 +3,7 @@ package main
 import com.squareup.kotlinpoet.*
 import org.apache.avro.Schema
 
-interface KotlinAvroConverter<K, A> {
-}
+interface KotlinAvroConverter<K, A>
 
 object DataClassConverterGenerator {
     fun generateFrom(avroSpec: SkinnyAvroFileSpec): FileMaker {
@@ -43,12 +42,12 @@ object DataClassConverterGenerator {
                 )
                 builder.addType(TypeSpec.classBuilder(fileName)
                         .addSuperinterface(superinterface = superclass)
-//                        .addFunction(buildConverterToAvroOverride(schemaSpec))
-//                        .addFunction(buildConverterFromAvroOverride(schemaSpec))
-//                        .companionObject(TypeSpec.companionObjectBuilder()
-//                                .addFunction(buildConverterToAvro(schemaSpec))
-//                                .addFunction(buildConverterFromAvro(schemaSpec))
-//                                .build())
+                        .addFunction(buildConverterToAvroOverride(schemaSpec))
+                        .addFunction(buildConverterFromAvroOverride(schemaSpec))
+                        .companionObject(TypeSpec.companionObjectBuilder()
+                                .addFunction(buildEnumConverterToAvro(schemaSpec))
+                                .addFunction(buildEnumConverterFromAvro(schemaSpec))
+                                .build())
                         .build())
             }
         }
@@ -99,6 +98,16 @@ object DataClassConverterGenerator {
         return buildConverterToAvro
     }
 
+    private fun buildEnumConverterToAvro(schemaSpec: SkinnySchemaSpec): FunSpec {
+        val toAvroSpecificRecordParameterName = schemaSpec.name.decapitalize()
+        val parameterName = schemaSpec.name.decapitalize()
+        val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
+                .addParameter(name = parameterName, type = ClassName(schemaSpec.namespace, "${schemaSpec.name}Kt"))
+                .addStatement("return ${schemaSpec.namespace}.${schemaSpec.name}.valueOf(${toAvroSpecificRecordParameterName}.name)")
+                .build()
+        return buildConverterToAvro
+    }
+
     private fun buildConverterFromAvro(schemaSpec: SkinnySchemaSpec): FunSpec {
         val fromAvroSpecificRecordParameterName = schemaSpec.name.decapitalize()
         val kotlinConstructorFieldList = schemaSpec.fields
@@ -117,6 +126,17 @@ object DataClassConverterGenerator {
                         name = fromAvroSpecificRecordParameterName,
                         type = ClassName(schemaSpec.namespace, schemaSpec.name))
                 .addStatement("return ${schemaSpec.name}Kt${kotlinConstructorFieldList}")
+        val fromAvroSpecificRecordFunction = fromAvroSpecificRecordBuilder.build()
+        return fromAvroSpecificRecordFunction
+    }
+
+    private fun buildEnumConverterFromAvro(schemaSpec: SkinnySchemaSpec): FunSpec {
+        val fromAvroSpecificRecordParameterName = schemaSpec.name.decapitalize()
+        val fromAvroSpecificRecordBuilder = FunSpec.builder("fromAvroSpecificRecord")
+                .addParameter(
+                        name = fromAvroSpecificRecordParameterName,
+                        type = ClassName(schemaSpec.namespace, schemaSpec.name))
+                .addStatement("return ${schemaSpec.name}Kt.valueOf(${fromAvroSpecificRecordParameterName}.name)")
         val fromAvroSpecificRecordFunction = fromAvroSpecificRecordBuilder.build()
         return fromAvroSpecificRecordFunction
     }
