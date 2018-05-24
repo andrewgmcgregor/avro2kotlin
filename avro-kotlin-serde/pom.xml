@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>avro-kotlin-demo</artifactId>
+    <artifactId>avro-kotlin-serde</artifactId>
     <packaging>jar</packaging>
 
-    <name>Avro Kotlin Demo</name>
+    <name>Avro Kotlin Serde</name>
 
     <properties>
         <pluginTestingVersion>1.3</pluginTestingVersion>
@@ -22,11 +22,6 @@
         <dependency>
             <groupId>avro2kotlin</groupId>
             <artifactId>avro-kotlin-compiler</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>avro2kotlin</groupId>
-            <artifactId>avro-kotlin-serde</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

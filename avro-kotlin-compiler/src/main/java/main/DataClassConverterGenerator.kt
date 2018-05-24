@@ -3,8 +3,6 @@ package main
 import com.squareup.kotlinpoet.*
 import org.apache.avro.Schema
 
-interface KotlinAvroConverter<K, A>
-
 object DataClassConverterGenerator {
     fun generateFrom(avroSpec: SkinnyAvroFileSpec): FileMaker {
         val converterAvroSpec = avroSpec.copy(

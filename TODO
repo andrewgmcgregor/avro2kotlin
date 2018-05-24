@@ -1,4 +1,7 @@
-move serde into its own module
+call don't copy avro code
+clean up / refactor
+publish to maven central?
+
 support arrays
 support maps
 support other innerTypes
@@ -12,3 +15,5 @@ get the integration tests to run without a real kafka broker
 
 stop looking up the kotlin class at runtime in the serialiser
 replace avro type: boolean with a comparison to known primitive supported types.
+
+gradle plugin

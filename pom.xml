@@ -21,6 +21,7 @@
         <module>avro-kotlin-compiler</module>
         <module>avro-kotlin-demo</module>
         <module>avro-kotlin-maven-plugin</module>
+        <module>avro-kotlin-serde</module>
     </modules>
 
     <properties>
@@ -51,6 +52,11 @@
             <dependency>
                 <groupId>avro2kotlin</groupId>
                 <artifactId>avro-kotlin-maven-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>avro2kotlin</groupId>
+                <artifactId>avro-kotlin-serde</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
