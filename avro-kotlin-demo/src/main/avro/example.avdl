@@ -1,11 +1,11 @@
 @namespace("demo")
 protocol ExampleInterface {
 
-//  enum ExampleEnum {
-//    FOO,
-//    BAR,
-//    BAZ
-//  }
+  enum ExampleEnum {
+    FOO,
+    BAR,
+    BAZ
+  }
 
   record ExampleNesting {
 

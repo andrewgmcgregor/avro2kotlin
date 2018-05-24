@@ -9,12 +9,19 @@ object DataClassGenerator {
         val builder = FileSpec.builder(avroSpec.namespace, avroSpec.name)
         avroSpec.schemaSpecs.forEach { schemaSpec ->
             if (schemaSpec.type == Schema.Type.RECORD) {
-                val fileName = "${schemaSpec.name}Kt"
-                builder.addType(TypeSpec.classBuilder(fileName)
+                val kotlinClassName = "${schemaSpec.name}Kt"
+                builder.addType(TypeSpec.classBuilder(kotlinClassName)
                         .addModifiers(KModifier.DATA)
                         .primaryConstructor(buildPrimaryConstructor(schemaSpec))
                         .addProperties(buildPropertySpecs(schemaSpec))
                         .build())
+            } else if (schemaSpec.type == Schema.Type.ENUM) {
+                val kotlinClassName = "${schemaSpec.name}Kt"
+                val enumBuilder = TypeSpec.enumBuilder(kotlinClassName)
+                schemaSpec.fields.forEach { minimalFieldSpec ->
+                    enumBuilder.addEnumConstant(name = minimalFieldSpec.name)
+                }
+                builder.addType(enumBuilder.build())
             }
         }
 
@@ -25,7 +32,7 @@ object DataClassGenerator {
     private fun buildPrimaryConstructor(schemaSpec: SkinnySchemaSpec): FunSpec {
         val primaryConstructorBuilder = FunSpec.constructorBuilder()
         schemaSpec.fields.forEach { minimalFieldSpec ->
-            primaryConstructorBuilder.addParameter(minimalFieldSpec.name, minimalFieldSpec.minimalTypeSpec.kotlinType)
+            primaryConstructorBuilder.addParameter(minimalFieldSpec.name, minimalFieldSpec.minimalTypeSpec!!.kotlinType)
         }
         val primaryConstructor = primaryConstructorBuilder.build()
         return primaryConstructor
@@ -34,7 +41,7 @@ object DataClassGenerator {
     private fun buildPropertySpecs(schemaSpec: SkinnySchemaSpec): Iterable<PropertySpec> {
         return schemaSpec.fields.map { minimalFieldSpec ->
                     PropertySpec
-                            .builder(name = minimalFieldSpec.name, type = minimalFieldSpec.minimalTypeSpec.kotlinType)
+                            .builder(name = minimalFieldSpec.name, type = minimalFieldSpec.minimalTypeSpec!!.kotlinType)
                             .initializer(minimalFieldSpec.name)
                             .build()
                 }

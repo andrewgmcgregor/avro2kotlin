@@ -62,7 +62,7 @@ object KotlinGenerator {
         return schemaToFieldNamesAndTypes(schema)
                 .map { minimalFieldSpec ->
                     PropertySpec
-                            .builder(name = minimalFieldSpec.name, type = minimalFieldSpec.minimalTypeSpec.kotlinType)
+                            .builder(name = minimalFieldSpec.name, type = minimalFieldSpec.minimalTypeSpec!!.kotlinType)
                             .initializer(minimalFieldSpec.name)
                             .build()
                 }
@@ -148,7 +148,7 @@ object KotlinGenerator {
 
     private fun buildConverterToAvro(schema: Schema): FunSpec {
         var argList = schemaToFieldNamesAndTypes(schema)
-                .map { it.name + if (it.minimalTypeSpec.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
+                .map { it.name + if (it.minimalTypeSpec!!.avroType) "${if (it.minimalTypeSpec.kotlinType.nullable) "?" else ""}.toAvroSpecificRecord()" else "" }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val buildConverterToAvro = FunSpec.builder("toAvroSpecificRecord")
                 .addStatement("return ${javaName(schema)}${argList}")
@@ -162,10 +162,10 @@ object KotlinGenerator {
                 .map {
                     var param = "${fromAvroSpecificRecordParameterName}.${it.name}"
                     "${it.name} = " +
-                            "${if (it.minimalTypeSpec.kotlinType.nullable) "if (${param} == null) null else " else ""}" +
-                            "${if (it.minimalTypeSpec.avroType) "${it.minimalTypeSpec.kotlinType.asNonNullable()}.fromAvroSpecificRecord(" else ""}" +
+                            "${if (it.minimalTypeSpec!!.kotlinType.nullable) "if (${param} == null) null else " else ""}" +
+                            "${if (it.minimalTypeSpec!!.avroType) "${it.minimalTypeSpec.kotlinType.asNonNullable()}.fromAvroSpecificRecord(" else ""}" +
                             param +
-                            "${if (it.minimalTypeSpec.avroType) ")" else ""}"
+                            "${if (it.minimalTypeSpec!!.avroType) ")" else ""}"
                 }
                 .joinToString(prefix = "(", separator = ", ", postfix = ")")
         val fromAvroSpecificRecordBuilder = FunSpec.builder("fromAvroSpecificRecord")
@@ -190,7 +190,7 @@ object KotlinGenerator {
     private fun buildPrimaryConstructor(schema: Schema): FunSpec {
         val primaryConstructorBuilder = FunSpec.constructorBuilder()
         schemaToFieldNamesAndTypes(schema).forEach { minimalFieldSpec ->
-            primaryConstructorBuilder.addParameter(minimalFieldSpec.name, minimalFieldSpec.minimalTypeSpec.kotlinType)
+            primaryConstructorBuilder.addParameter(minimalFieldSpec.name, minimalFieldSpec.minimalTypeSpec!!.kotlinType)
         }
         val primaryConstructor = primaryConstructorBuilder.build()
         return primaryConstructor

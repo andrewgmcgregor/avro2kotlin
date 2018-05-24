@@ -67,13 +67,19 @@ object SkinnySchemaSpecBuilder {
     }
 
     private fun schemaToFieldNamesAndTypes(schema: Schema): List<MinimalFieldSpec> {
-        return schema.fields
-                .filterNotNull()
-                .map { field ->
-                    MinimalFieldSpec(
-                            name = field.name(),
-                            minimalTypeSpec = toKotlinType(field.schema()))
-                }
+        when (schema.type) {
+            Schema.Type.RECORD -> return schema.fields
+                    .filterNotNull()
+                    .map { field ->
+                        MinimalFieldSpec(
+                                name = field.name(),
+                                minimalTypeSpec = toKotlinType(field.schema()))
+                    }
+            Schema.Type.ENUM -> return schema.enumSymbols
+                    .filterNotNull()
+                    .map { enumSymbol -> MinimalFieldSpec(name = enumSymbol, minimalTypeSpec = null) }
+            else -> throw IllegalArgumentException("schemaToFieldNamesAndTypes does not support ${schema.type}")
+        }
     }
 
     private fun toKotlinType(schema: Schema): MinimalTypeSpec {

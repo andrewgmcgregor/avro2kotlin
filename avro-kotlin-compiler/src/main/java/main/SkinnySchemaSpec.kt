@@ -13,7 +13,7 @@ data class SkinnySchemaSpec(val namespace: String,
                             val fields: List<MinimalFieldSpec> = listOf())
 
 data class MinimalFieldSpec(val name: String,
-                            val minimalTypeSpec: MinimalTypeSpec)
+                            val minimalTypeSpec: MinimalTypeSpec?)
 
 data class MinimalTypeSpec(val namespace: String,
                            val name: String,
