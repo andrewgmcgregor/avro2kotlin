@@ -1,5 +1,4 @@
-check nullable enums
-
+move serde into its own module
 support arrays
 support maps
 support other innerTypes

@@ -33,7 +33,7 @@ object AvroBasedExampleProducer {
                 var exampleKt = ExampleKt(
                         id = index.toLong(),
                         exampleNesting = ExampleNestingKt(index == 0),
-                        my_enum = ExampleEnumKt.FOO,
+                        my_enum = if (index %  1 == 0) null else ExampleEnumKt.values()[index % 3],
                         my_nested_member = if (index == 0) null else ExampleNestingKt(true),
                         guid = "name-$favoriteColour")
                 val record = ProducerRecord(

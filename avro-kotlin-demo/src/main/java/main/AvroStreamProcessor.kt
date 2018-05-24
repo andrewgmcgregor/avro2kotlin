@@ -25,8 +25,8 @@ fun main(args: Array<String>) {
 
     builder.stream<String, ExampleKt>(PRODUCER_OUTPUT_TOPIC)
             .peek { key, value -> println("${key} = ${value}") }
-            .mapValues { it.copy(my_enum = ExampleEnumKt.BAR) }
-            .to("avro.test.output.topic.with.kotlin.2")
+            .mapValues { example -> example.copy(my_enum = ExampleEnumKt.values()[(example.id.toInt() + 1) % 3]) }
+            .to("avro.test.output.topic.with.kotlin")
 
     val kafkaStreams = KafkaStreams(builder.build(), config)
     kafkaStreams.start()

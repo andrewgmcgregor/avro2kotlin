@@ -23,8 +23,7 @@ protocol ExampleInterface {
 
     ExampleNesting exampleNesting;
 
-    ExampleEnum my_enum = null;
-//    union { null, ExampleEnum } my_enum = null;
+    union { null, ExampleEnum } my_enum = null;
 
     union { null, ExampleNesting } my_nested_member = null;
 
