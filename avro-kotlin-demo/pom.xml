@@ -103,7 +103,7 @@
                         <goals>
                             <goal>idl-protocol</goal>
                             <goal>schema</goal>
-                            <goal>kotlin-generator</goal>
+                            <goal>kotlin-generate</goal>
                         </goals>
                         <configuration>
                             <stringType>String</stringType>
