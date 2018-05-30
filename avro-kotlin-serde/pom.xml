@@ -88,26 +88,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>avro2kotlin</groupId>
-                <artifactId>avro-kotlin-maven-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>idl-protocol</goal>
-                            <goal>schema</goal>
-                            <goal>kotlin-generator</goal>
-                        </goals>
-                        <configuration>
-                            <stringType>String</stringType>
-                            <enableDecimalLogicalType>true</enableDecimalLogicalType>
-                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
