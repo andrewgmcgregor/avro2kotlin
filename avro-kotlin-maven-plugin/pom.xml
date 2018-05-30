@@ -12,7 +12,7 @@
     <artifactId>avro-kotlin-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
-    <name>Avro Kafka Maven Plugin</name>
+    <name>Avro Kotlin Maven Plugin</name>
     <description>Maven plugin for Avro IDL and Specific API Kotlin (+ Java) Compilers</description>
 
     <properties>
