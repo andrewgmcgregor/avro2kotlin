@@ -101,7 +101,6 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>idl-protocol</goal>
                             <goal>schema</goal>
                             <goal>kotlin-generate</goal>
                         </goals>

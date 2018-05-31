@@ -18,13 +18,16 @@
 
 package org.apache.avro.mojo;
 
+import org.apache.avro.compiler.specific.SpecificCompiler;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-
-import static org.apache.avro.mojo.KotlinGeneratorTaskFinder.findAllTasks;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Generate Kotlin classes and interfaces
@@ -42,7 +45,7 @@ public class KotlinGeneratorMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String[] includes = new String[]{"**/*.avdl", "**/*.avsc"};
+    private String[] idlIncludes = new String[]{"**/*.avdl"};
 
     /**
      * A set of Ant-like inclusion patterns used to select files from the source
@@ -51,7 +54,25 @@ public class KotlinGeneratorMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String[] testIncludes = new String[]{"**/*.avdl", "**/*.avsc"};
+    private String[] idlTestIncludes = new String[]{"**/*.avdl"};
+
+    /**
+     * A set of Ant-like inclusion patterns used to select files from the source
+     * directory for processing. By default, the pattern
+     * <code>**&#47;*.avsc</code> is used to select Schema files.
+     *
+     * @parameter
+     */
+    private String[] schemaIncludes = new String[]{"**/*.avsc"};
+
+    /**
+     * A set of Ant-like inclusion patterns used to select files from the source
+     * directory for processing. By default, the pattern
+     * <code>**&#47;*.avsc</co  de> is used to select Schema files.
+     *
+     * @parameter
+     */
+    private String[] schemaTestIncludes = new String[]{"**/*.avsc"};
 
     /**
      * The source directory of avro files. This directory is added to the
@@ -60,25 +81,25 @@ public class KotlinGeneratorMojo extends AbstractMojo {
      * source directory.
      *
      * @parameter property="sourceDirectory"
-     *            default-value="${basedir}/src/main/avro"
+     * default-value="${basedir}/src/main/avro"
      */
     private File sourceDirectory;
 
     /**
      * @parameter property="outputDirectory"
-     *            default-value="${project.build.directory}/generated-sources/avro"
+     * default-value="${project.build.directory}/generated-sources/avro"
      */
     private File outputDirectory;
 
     /**
      * @parameter property="sourceDirectory"
-     *            default-value="${basedir}/src/test/avro"
+     * default-value="${basedir}/src/test/avro"
      */
     private File testSourceDirectory;
 
     /**
      * @parameter property="outputDirectory"
-     *            default-value="${project.build.directory}/generated-test-sources/avro"
+     * default-value="${project.build.directory}/generated-test-sources/avro"
      */
     private File testOutputDirectory;
 
@@ -95,6 +116,7 @@ public class KotlinGeneratorMojo extends AbstractMojo {
      * A list of files or directories that should be compiled first thus making
      * them importable by subsequently compiled schemas. Note that imported files
      * should not reference each other.
+     *
      * @parameter
      */
     protected String[] imports;
@@ -117,7 +139,8 @@ public class KotlinGeneratorMojo extends AbstractMojo {
      */
     protected String[] testExcludes = new String[0];
 
-    /**  The Java type to use for Avro strings.  May be one of CharSequence,
+    /**
+     * The Java type to use for Avro strings.  May be one of CharSequence,
      * String or Utf8.  CharSequence by default.
      *
      * @parameter property="stringType"
@@ -160,27 +183,37 @@ public class KotlinGeneratorMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         KotlinGeneratorContext context = new KotlinGeneratorContext(
-                includes,
-                testIncludes,
+                null,
+                null,
                 sourceDirectory,
                 outputDirectory,
                 testSourceDirectory,
                 testOutputDirectory,
-                fieldVisibility,
+                getFieldVisibility(fieldVisibility),
                 imports,
                 excludes,
                 testExcludes,
                 stringType,
                 templateDirectory,
                 createSetters,
-                enableDecimalLogicalType
+                enableDecimalLogicalType,
+                getOrWrapInMojoExecutionException(() -> project.getRuntimeClasspathElements())
         );
 
-        findAllTasks(context).forEach(task -> {
-            KotlinGenerator.generate(task.filename, task.sourceDirectory, task.outputDirectory);
-        });
+        KotlinGenerator.generateAll(context.copy(
+                concatStringArrays(idlIncludes, schemaIncludes),
+                concatStringArrays(idlTestIncludes, schemaTestIncludes)));
+
+        IDLProtocolJavaGenerator.generateAll(context.copy(idlIncludes, idlTestIncludes));
 
         configureMavenProject(context);
+    }
+
+    private String[] concatStringArrays(String[]... strings) {
+        return Stream.of(strings)
+                .flatMap(Stream::of)
+                .collect(Collectors.toList())
+                .toArray(new String[0]);
     }
 
     private void configureMavenProject(KotlinGeneratorContext context) {
@@ -190,6 +223,23 @@ public class KotlinGeneratorMojo extends AbstractMojo {
 
         if (context.hasTestDir()) {
             project.addTestCompileSourceRoot(context.getTestOutputDirectory().getAbsolutePath());
+        }
+    }
+
+    private static SpecificCompiler.FieldVisibility getFieldVisibility(String fieldVisibility) {
+        try {
+            String upper = String.valueOf(fieldVisibility).trim().toUpperCase();
+            return SpecificCompiler.FieldVisibility.valueOf(upper);
+        } catch (IllegalArgumentException e) {
+            return SpecificCompiler.FieldVisibility.PUBLIC_DEPRECATED;
+        }
+    }
+
+    private List getOrWrapInMojoExecutionException(Callable<List<Object>> action) throws MojoExecutionException {
+        try {
+            return action.call();
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 

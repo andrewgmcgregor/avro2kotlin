@@ -1,6 +1,5 @@
-            package org.apache.avro.mojo;
+package org.apache.avro.mojo;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 public class KotlinGeneratorTaskFinder {
 
     @NotNull
-    public static List<KotlinGeneratorTask> findAllTasks(KotlinGeneratorContext context) throws MojoExecutionException {
+    public static List<KotlinGeneratorTask> findAllTasks(KotlinGeneratorContext context) {
         List<KotlinGeneratorTask> tasks = new ArrayList<>();
 
         if (!context.hasSourceDir() && !context.hasTestDir()) {

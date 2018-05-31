@@ -5,21 +5,24 @@ import main.DataClassGenerator;
 import main.SkinnyAvroFileSpec;
 import main.SkinnySchemaSpecBuilder;
 
-import java.io.File;
+import static org.apache.avro.mojo.KotlinGeneratorTaskFinder.findAllTasks;
 
 public class KotlinGenerator {
 
-    public static void generate(String filename, File sourceDirectory, File outputDirectory) {
-        String inputFile = sourceDirectory.getAbsolutePath() + "/" + filename;
+    public static void generateAll(KotlinGeneratorContext context) {
+        findAllTasks(context).forEach(task -> generate(context, task));
+    }
+
+    public static void generate(KotlinGeneratorContext context, KotlinGeneratorTask generatorTask) {
+        String inputFile = context.getSourceDirectory().getAbsolutePath() + "/" + generatorTask.filename;
         SkinnyAvroFileSpec skinnyAvroFileSpec = SkinnySchemaSpecBuilder.INSTANCE.generateFromFile(inputFile);
 
         DataClassGenerator.INSTANCE
                 .generateFrom(skinnyAvroFileSpec)
-                .writeFileRelativeTo(outputDirectory);
+                .writeFileRelativeTo(generatorTask.outputDirectory);
 
         DataClassConverterGenerator.INSTANCE
                 .generateFrom(skinnyAvroFileSpec)
-                .writeFileRelativeTo(outputDirectory);
+                .writeFileRelativeTo(generatorTask.outputDirectory);
     }
-
 }
