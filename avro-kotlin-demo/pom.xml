@@ -101,12 +101,9 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>schema</goal>
                             <goal>kotlin-generate</goal>
                         </goals>
                         <configuration>
-                            <stringType>String</stringType>
-                            <enableDecimalLogicalType>true</enableDecimalLogicalType>
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                         </configuration>
                     </execution>

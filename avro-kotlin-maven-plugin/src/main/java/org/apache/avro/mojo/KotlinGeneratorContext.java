@@ -21,6 +21,7 @@ public class KotlinGeneratorContext {
     private final boolean createSetters;
     private final boolean enableDecimalLogicalType;
     private final List runtimeClasspathElements;
+    private final String sourceEncoding;
 
     public KotlinGeneratorContext(String[] includes,
                                   String[] testIncludes,
@@ -36,7 +37,8 @@ public class KotlinGeneratorContext {
                                   String templateDirectory,
                                   boolean createSetters,
                                   boolean enableDecimalLogicalType,
-                                  List runtimeClasspathElements) {
+                                  List runtimeClasspathElements,
+                                  String sourceEncoding) {
         this.includes = includes;
         this.testIncludes = testIncludes;
         this.sourceDirectory = sourceDirectory;
@@ -52,6 +54,7 @@ public class KotlinGeneratorContext {
         this.createSetters = createSetters;
         this.enableDecimalLogicalType = enableDecimalLogicalType;
         this.runtimeClasspathElements = runtimeClasspathElements;
+        this.sourceEncoding = sourceEncoding;
     }
 
     public KotlinGeneratorContext copy(String[] includes, String[] testIncludes) {
@@ -70,8 +73,8 @@ public class KotlinGeneratorContext {
                 this.templateDirectory,
                 this.createSetters,
                 this.enableDecimalLogicalType,
-                this.runtimeClasspathElements
-            );
+                this.runtimeClasspathElements,
+                this.sourceEncoding);
     }
 
     public String[] getIncludes() {
@@ -144,5 +147,9 @@ public class KotlinGeneratorContext {
 
     public boolean hasTestDir() {
         return null != testSourceDirectory && testSourceDirectory.isDirectory();
+    }
+
+    public String getSourceEncoding() {
+        return sourceEncoding;
     }
 }

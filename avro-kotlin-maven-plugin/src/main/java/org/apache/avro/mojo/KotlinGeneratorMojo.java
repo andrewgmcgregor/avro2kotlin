@@ -145,7 +145,7 @@ public class KotlinGeneratorMojo extends AbstractMojo {
      *
      * @parameter property="stringType"
      */
-    protected String stringType = "CharSequence";
+    protected String stringType = "String";
 
     /**
      * The directory (within the java classpath) that contains the velocity templates
@@ -167,9 +167,9 @@ public class KotlinGeneratorMojo extends AbstractMojo {
     /**
      * Determines whether or not to use Java classes for decimal types
      *
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
-    protected boolean enableDecimalLogicalType;
+    protected boolean enableDecimalLogicalType = true;
 
     /**
      * The current Maven project.
@@ -197,14 +197,16 @@ public class KotlinGeneratorMojo extends AbstractMojo {
                 templateDirectory,
                 createSetters,
                 enableDecimalLogicalType,
-                getOrWrapInMojoExecutionException(() -> project.getRuntimeClasspathElements())
-        );
+                getOrWrapInMojoExecutionException(() -> project.getRuntimeClasspathElements()),
+                project.getProperties().getProperty("project.build.sourceEncoding"));
 
         KotlinGenerator.generateAll(context.copy(
                 concatStringArrays(idlIncludes, schemaIncludes),
                 concatStringArrays(idlTestIncludes, schemaTestIncludes)));
 
         IDLProtocolJavaGenerator.generateAll(context.copy(idlIncludes, idlTestIncludes));
+
+        SchemaJavaGenerator.generateAll(context.copy(schemaIncludes, schemaTestIncludes));
 
         configureMavenProject(context);
     }
