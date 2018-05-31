@@ -1,6 +1,7 @@
-call don't copy avro code
+sort out packages - give them a common prefix
 clean up / refactor
-publish to maven central?
+call demo stream processor code with tests, removing the need to run kafka locally
+publish to maven central
 
 support arrays
 support maps
