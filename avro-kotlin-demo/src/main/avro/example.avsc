@@ -1,4 +1,4 @@
-{"namespace": "demo",
+{"namespace": "net.avro2kotlin.demo",
  "type": "record",
  "name": "ExamplePerson",
  "fields": [

@@ -101,7 +101,7 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>kotlin-generate</goal>
+                            <goal>generate</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>

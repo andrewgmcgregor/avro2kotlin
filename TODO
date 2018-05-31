@@ -1,4 +1,4 @@
-sort out packages - give them a common prefix
+make generated java code package-private, so it's harder to accidentally not use the generated kotlin
 clean up / refactor
 call demo stream processor code with tests, removing the need to run kafka locally
 publish to maven central
